@@ -281,9 +281,11 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .h2note{font-size:12px;color:var(--muted);letter-spacing:0;font-weight:400}
 .dr-list a{position:relative;overflow:hidden;min-height:84px;display:flex;align-items:center}
 .dr-list a span{position:relative;z-index:1}
-.dr-art{position:absolute;right:6px;bottom:4px;width:124px;height:66px;opacity:.85}
-body[data-trip="hokkaido"]{background-image:var(--bg-hokkaido);background-size:420px 840px}
-body[data-trip="ishigaki"]{--bg:#E6ECE8;background-color:var(--bg);background-image:var(--bg-ishigaki);background-size:420px 840px}
+.dr-art{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;align-items:flex-end;gap:2px}
+.dr-art img{width:34px;height:34px}
+.dr-art img:nth-child(2){width:42px;height:42px}
+.dr-list a{padding-right:130px}
+body[data-trip="ishigaki"]{--bg:#E6ECE8;background-color:var(--bg)}
 .mfold .rate{margin:0 14px 10px}
 .mfold .stl{width:calc(100% - 20px);margin:0 10px}
 .mfold .stlnote{margin:6px 14px 0}
@@ -303,6 +305,35 @@ body[data-trip="ishigaki"]{--bg:#E6ECE8;background-color:var(--bg);background-im
 .shnote{grid-column:1/-1;font-size:12.5px;color:var(--rose)}
 .shnote.ok{color:var(--sage)}
 .cp.move .card,.soon-card,.hint,.count{background:rgba(247,243,236,.86)}
+.bgart{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.bgart img{position:absolute;opacity:.26}
+body[data-trip="ishigaki"] .bgart img{opacity:.3}
+.world{background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:10px 6px 6px;margin:14px 12px 0;box-shadow:0 3px 0 rgba(57,56,51,.08)}
+.world .lbl{font-weight:700;paint-order:stroke;stroke:var(--paper);stroke-width:3px}
+.world .sm{paint-order:stroke;stroke:var(--paper);stroke-width:3px}
+.isle{position:relative;height:190px;background:linear-gradient(#DDEFF7 0 62%,#BFE0EE 62%)}
+.isle img{position:absolute}
+.i-sun{width:62px;top:14px;right:22px}.i-palm{width:92px;left:28px;top:30px}.i-beach{width:84px;left:42%;top:56px}.i-turtle{width:52px;right:30%;bottom:10px}.i-fish{width:42px;left:14%;bottom:14px}.i-hib{width:40px;right:16px;bottom:20px}
+.ledfold .h2note.in{margin:0 14px 8px}
+.ledfold #spent .spent{margin:0 10px 10px}
+.ledfold .ledger{margin:0 10px;padding-bottom:10px}
+@media (min-width: 900px){
+  .wrap{max-width:1120px}
+  .bar .wrap{max-width:1120px}
+  #view.v-overview{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);column-gap:36px;align-items:start;padding:0 24px}
+  #view.v-overview .world{grid-column:1;grid-row:1 / span 8;margin:20px 0 0}
+  #view.v-overview > :not(.world){grid-column:2}
+  #view.v-overview .intro{padding-top:30px}
+  #view.v-overview .hlfold,#view.v-overview .legend,#view.v-overview .endnote{margin-left:0;margin-right:0}
+  #view.v-day,#view.v-ishigaki{max-width:820px}
+  #view.v-cost{display:grid;grid-template-columns:minmax(0,430px) minmax(0,1fr);column-gap:32px;align-items:start;padding:0 24px}
+  #view.v-cost > *{grid-column:2}
+  #view.v-cost > .stagehead{grid-column:1 / -1}
+  #view.v-cost > .addform{grid-column:1;grid-row:2 / span 20;position:sticky;top:96px;margin:12px 0 0}
+  #view.v-cost > .fold{margin-left:0;margin-right:0}
+  .hl{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .drawer{width:360px}
+}
 /* folds */
 .fold{margin:20px 18px 0;background:var(--paper);border:1px solid var(--line);border-radius:4px}
 .fold summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:baseline;gap:10px;font-size:15.5px;letter-spacing:.1em}
@@ -334,6 +365,7 @@ body[data-trip="ishigaki"]{--bg:#E6ECE8;background-color:var(--bg);background-im
 <header class="bar"><div class="wrap">
   <div class="bar-top"><button class="burger" id="menuBtn" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button><a class="brand" id="brand" href="#overview"><span id="brandName">冬雪北海道</span><small>QUEST MAP</small></a><nav class="nav" id="topnav" aria-label="本次旅程"><a class="word" href="#overview"><b>地圖</b><small>MAP</small></a><a class="word" href="#cost"><b>錢錢</b><small>MONEY</small></a></nav><button class="today" id="todayBtn" type="button">TODAY</button></div>
 </div></header>
+<div class="bgart" id="bgart" aria-hidden="true"></div>
 <div class="scrim" id="scrim" hidden></div>
 <aside class="drawer" id="drawer" aria-label="選單" hidden></aside>
 <main class="wrap view" id="view"></main>
@@ -386,48 +418,31 @@ function state(d){ const t = today0().getTime(), x = dayDate(d).getTime(); retur
 function daysUntil(){ return Math.round((dayDate(DAYS[0]) - today0()) / 86400000); }
 
 /* ===== trip backgrounds ===== */
-const BGK = 'stroke="#4A4740" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"';
-function bgFace(x, y, s){ s = s || 1; return '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')"><circle cx="-4.5" cy="0" r="1.8" fill="#4A4740" stroke="none"/><circle cx="4.5" cy="0" r="1.8" fill="#4A4740" stroke="none"/><circle cx="-3.9" cy="-.6" r=".6" fill="#fff" stroke="none"/><circle cx="5.1" cy="-.6" r=".6" fill="#fff" stroke="none"/><path d="M-2.2 3.2 q2.2 2 4.4 0" fill="none" stroke-width="1.6"/><ellipse cx="-8" cy="3" rx="2.6" ry="1.6" fill="#F4A9B4" stroke="none"/><ellipse cx="8" cy="3" rx="2.6" ry="1.6" fill="#F4A9B4" stroke="none"/></g>'; }
-function bgSpark(x, y, c){ return '<path transform="translate(' + x + ' ' + y + ')" d="M0 -8 Q1.5 -1.5 8 0 Q1.5 1.5 0 8 Q-1.5 1.5 -8 0 Q-1.5 -1.5 0 -8Z" fill="' + c + '" stroke="none"/>'; }
-function bgFlake(x, y, r){ return '<g transform="translate(' + x + ' ' + y + ')" stroke="#8FB8DE" stroke-width="2.4" stroke-linecap="round" fill="none"><path d="M0 -' + r + 'V' + r + 'M-' + (r*.87) + ' -' + (r/2) + ' ' + (r*.87) + ' ' + (r/2) + 'M-' + (r*.87) + ' ' + (r/2) + ' ' + (r*.87) + ' -' + (r/2) + '"/><circle r="2.2" fill="#8FB8DE" stroke="none"/></g>'; }
-const BG_HOKKAIDO = '<svg xmlns="http://www.w3.org/2000/svg" width="420" height="840" viewBox="0 0 420 840"><g opacity=".17" ' + BGK + '>' +
-  /* happy mountain */ '<g transform="translate(14 46)"><path d="M0 76 Q8 60 22 40 L44 10 Q52 0 60 10 L82 40 Q96 60 104 76 Z" fill="#BFD7EA"/><path d="M32 26 L44 10 Q52 0 60 10 L72 26 Q66 32 60 26 Q54 34 48 26 Q40 32 32 26 Z" fill="#fff"/>' + bgFace(52, 50, 1.1) + '</g>' +
-  /* shimaenaga */ '<g transform="translate(296 40)"><path d="M46 30 l26 10 -2 6 -26 -6z" fill="#7C7468"/><ellipse cx="26" cy="28" rx="26" ry="22" fill="#fff"/><path d="M8 18 q8 -10 20 -10" fill="none"/>' + bgFace(26, 26, 1) + '<path d="M24 31 l2 3 2 -3z" fill="#4A4740"/><path d="M18 50 v8 M32 50 v8" fill="none"/></g>' +
-  /* cocoa mug */ '<g transform="translate(176 140)"><rect x="0" y="10" width="44" height="40" rx="10" fill="#F6C9A9"/><path d="M44 20 q14 0 14 12 q0 12 -14 12" fill="none" stroke-width="4" stroke="#4A4740"/><path d="M4 14 q18 -8 36 0" fill="#fff"/><path d="M14 0 q-4 -6 0 -12 M26 -2 q-4 -6 0 -12" fill="none"/>' + bgFace(22, 32, .9) + '</g>' +
-  /* fox */ '<g transform="translate(30 210)"><path d="M14 16 L6 0 L24 10 L40 10 L58 0 L50 16 Q56 44 32 50 Q8 44 14 16Z" fill="#F7B27A"/><path d="M20 38 Q32 48 44 38 Q40 52 32 52 Q24 52 20 38Z" fill="#fff"/>' + bgFace(32, 28, 1) + '<circle cx="32" cy="38" r="2.2" fill="#4A4740" stroke="none"/></g>' +
-  /* snowman */ '<g transform="translate(300 200)"><circle cx="26" cy="54" r="20" fill="#fff"/><circle cx="26" cy="22" r="15" fill="#fff"/><path d="M10 9 h32 v-4 h-6 v-12 h-20 v12 h-6z" fill="#E98585"/>' + bgFace(26, 22, .9) + '<path d="M26 26 l10 2 -10 2z" fill="#F7B27A"/><path d="M12 36 h28" stroke="#8FB8DE" stroke-width="6"/></g>' +
-  /* ramen bowl */ '<g transform="translate(150 310)"><path d="M0 24 H76 Q74 60 38 60 Q2 60 0 24Z" fill="#F5D07A"/><path d="M10 24 q7 -10 14 0 q7 -10 14 0 q7 -10 14 0 q7 -10 14 0" fill="none"/><circle cx="58" cy="16" r="8" fill="#fff"/><circle cx="58" cy="16" r="3.6" fill="#F5B940" stroke="none"/><path d="M64 -14 L40 20 M72 -12 L48 20" fill="none" stroke-width="3"/>' + bgFace(38, 42, 1) + '</g>' +
-  /* penguin */ '<g transform="translate(40 410)"><ellipse cx="24" cy="32" rx="22" ry="27" fill="#6B7A8F"/><ellipse cx="24" cy="38" rx="14" ry="19" fill="#fff"/><path d="M4 28 q-8 8 -4 16 M44 28 q8 8 4 16" fill="#6B7A8F"/>' + bgFace(24, 26, .9) + '<path d="M21 31 l3 3 3 -3z" fill="#F5B940"/><path d="M14 60 h8 M26 60 h8" stroke="#F5B940" stroke-width="4"/></g>' +
-  /* gondola */ '<g transform="translate(270 400)"><path d="M-20 4 L140 -30" fill="none"/><path d="M58 -14 V2" fill="none"/><rect x="28" y="2" width="60" height="48" rx="14" fill="#F4A9B4"/><rect x="36" y="10" width="44" height="16" rx="6" fill="#DDEEFB"/>' + bgFace(58, 38, .9) + '</g>' +
-  /* onsen monkey-free onsen tub */ '<g transform="translate(150 520)"><path d="M0 26 Q40 44 80 26 Q78 62 40 62 Q2 62 0 26Z" fill="#B9DDF0"/><path d="M20 16 q-8 -10 0 -20 q8 -10 0 -20 M40 16 q-8 -10 0 -20 q8 -10 0 -20 M60 16 q-8 -10 0 -20 q8 -10 0 -20" fill="none" stroke="#E98585"/>' + bgFace(40, 44, 1) + '</g>' +
-  /* owl */ '<g transform="translate(34 600)"><path d="M6 12 L14 0 L26 8 L38 8 L50 0 L58 12 Q64 58 32 62 Q0 58 6 12Z" fill="#D8B48A"/><circle cx="21" cy="26" r="9" fill="#fff"/><circle cx="43" cy="26" r="9" fill="#fff"/><circle cx="21" cy="26" r="3.6" fill="#4A4740" stroke="none"/><circle cx="43" cy="26" r="3.6" fill="#4A4740" stroke="none"/><path d="M29 34 l3 5 3 -5z" fill="#F5B940"/><ellipse cx="14" cy="40" rx="3" ry="2" fill="#F4A9B4" stroke="none"/><ellipse cx="50" cy="40" rx="3" ry="2" fill="#F4A9B4" stroke="none"/></g>' +
-  /* crab */ '<g transform="translate(290 600)"><ellipse cx="40" cy="34" rx="32" ry="22" fill="#F28B82"/><path d="M12 22 q-16 -18 -4 -28 q2 12 12 10 M68 22 q16 -18 4 -28 q-2 12 -12 10" fill="#F28B82"/><path d="M14 50 l-10 10 M26 54 l-4 12 M66 50 l10 10 M54 54 l4 12" fill="none"/>' + bgFace(40, 32, 1) + '</g>' +
-  /* beanie */ '<g transform="translate(170 680)"><path d="M0 40 Q0 0 34 0 Q68 0 68 40 Z" fill="#9AD0B5"/><rect x="-4" y="36" width="76" height="14" rx="7" fill="#fff"/><circle cx="34" cy="-6" r="9" fill="#fff"/></g>' +
-  /* mittens */ '<g transform="translate(40 750)"><path d="M0 12 Q0 0 13 0 Q26 0 26 15 V44 H2 Z" fill="#F4A9B4"/><path d="M-6 22 Q-12 16 -6 12 Q2 10 2 20" fill="#F4A9B4"/><path d="M38 16 Q38 4 51 4 Q64 4 64 19 V48 H40 Z" fill="#BFD7EA"/><rect x="0" y="40" width="28" height="8" rx="4" fill="#fff"/><rect x="38" y="44" width="28" height="8" rx="4" fill="#fff"/></g>' +
-  /* ski boots */ '<g transform="translate(296 740)"><path d="M10 0 H36 V40 Q36 50 50 52 V62 H6 Q4 50 10 40 Z" fill="#9AD0B5"/><path d="M12 14 h22 M12 26 h22" fill="none"/><path d="M-6 66 H70" fill="none" stroke-width="4" stroke="#E98585"/></g>' +
-  '</g><g opacity=".3">' + bgFlake(160, 40, 8) + bgFlake(250, 120, 6) + bgFlake(120, 196, 5) + bgFlake(380, 320, 7) + bgFlake(240, 470, 5) + bgFlake(120, 540, 7) + bgFlake(390, 560, 5) + bgFlake(110, 700, 8) + bgFlake(250, 800, 6) + bgSpark(255, 300, '#F5D07A') + bgSpark(30, 360, '#F4A9B4') + bgSpark(380, 690, '#F5D07A') + '</g></svg>';
-const BG_ISHIGAKI = '<svg xmlns="http://www.w3.org/2000/svg" width="420" height="840" viewBox="0 0 420 840"><g opacity=".17" ' + BGK + '>' +
-  /* sun */ '<g transform="translate(316 26)"><path d="M36 -4 V6 M36 66 v10 M-4 36 h10 M66 36 h10 M8 8 l7 7 M57 57 l7 7 M64 8 l-7 7 M8 64 l7 -7" fill="none" stroke="#F5B940" stroke-width="4"/><circle cx="36" cy="36" r="24" fill="#F5D07A"/>' + bgFace(36, 36, 1.1) + '</g>' +
-  /* palm */ '<g transform="translate(26 30)"><path d="M36 110 Q44 72 36 36" fill="none" stroke="#C99A6E" stroke-width="7"/><path d="M36 36 q-24 -8 -36 8 q14 -2 36 -8 q-8 -24 -32 -24 q12 8 32 24 q16 -20 40 -10 q-20 0 -40 10 q26 0 34 22 q-12 -12 -34 -22" fill="#8ED1A0"/><circle cx="32" cy="40" r="5" fill="#C99A6E"/><circle cx="42" cy="42" r="5" fill="#C99A6E"/></g>' +
-  /* turtle */ '<g transform="translate(160 140)"><ellipse cx="40" cy="34" rx="32" ry="22" fill="#8ED1A0"/><path d="M26 22 l14 -8 14 8 -14 8z" fill="#BDE8C8"/><path d="M8 18 l-10 -8 M8 50 l-10 8 M70 50 l8 8" fill="none" stroke-width="5"/><circle cx="80" cy="30" r="12" fill="#BDE8C8"/>' + bgFace(80, 30, .7) + '</g>' +
-  /* hibiscus */ '<g transform="translate(36 240)"><circle cx="26" cy="10" r="13" fill="#F28B82"/><circle cx="42" cy="24" r="13" fill="#F28B82"/><circle cx="36" cy="42" r="13" fill="#F28B82"/><circle cx="16" cy="42" r="13" fill="#F28B82"/><circle cx="10" cy="24" r="13" fill="#F28B82"/><circle cx="26" cy="28" r="7" fill="#F5D07A"/></g>' +
-  /* shisa */ '<g transform="translate(300 230)"><path d="M4 56 V24 Q4 2 32 2 Q60 2 60 24 V56 Z" fill="#F7B27A"/><path d="M4 22 q-10 -12 0 -20 q4 10 8 10 M60 22 q10 -12 0 -20 q-4 10 -8 10" fill="#F28B82"/>' + bgFace(32, 26, 1.1) + '<path d="M18 40 h28 l-6 8 h-16z" fill="#fff"/></g>' +
-  /* cloud */ '<g transform="translate(150 330)"><path d="M14 40 Q-2 40 2 26 Q6 14 20 18 Q24 2 42 4 Q58 6 60 20 Q76 18 76 32 Q76 40 64 40 Z" fill="#fff"/>' + bgFace(40, 26, .9) + '</g>' +
-  /* fish */ '<g transform="translate(40 420)"><path d="M0 22 Q30 -6 64 22 Q30 50 0 22Z" fill="#8FB8DE"/><path d="M64 22 L84 6 V38 Z" fill="#8FB8DE"/>' + bgFace(22, 20, .8) + '<path d="M38 12 q6 10 0 20" fill="none"/></g>' +
-  /* shell */ '<g transform="translate(296 410)"><path d="M0 54 Q36 -14 72 54 Z" fill="#F9D3C8"/><path d="M36 6 V54 M18 24 L26 54 M54 24 L46 54" fill="none"/></g>' +
-  /* boat */ '<g transform="translate(150 510)"><path d="M40 0 V48 M40 4 L74 40 H40 Z" fill="#fff"/><path d="M0 50 H88 Q80 72 60 72 H26 Q8 72 0 50 Z" fill="#8FB8DE"/>' + bgFace(44, 60, .8) + '</g>' +
-  /* pineapple */ '<g transform="translate(36 590)"><ellipse cx="28" cy="46" rx="22" ry="28" fill="#F5D07A"/><path d="M14 30 l28 32 M42 30 l-28 32" fill="none" stroke-width="1.6"/><path d="M28 18 l-12 -18 M28 18 l0 -22 M28 18 l12 -18" fill="none" stroke="#8ED1A0" stroke-width="5"/>' + bgFace(28, 50, .8) + '</g>' +
-  /* coconut drink */ '<g transform="translate(296 590)"><circle cx="34" cy="40" r="26" fill="#C99A6E"/><ellipse cx="34" cy="24" rx="20" ry="8" fill="#fff"/><path d="M42 20 L56 -12" fill="none" stroke="#F28B82" stroke-width="4"/><path d="M22 16 q6 -14 14 -6" fill="none" stroke="#8ED1A0" stroke-width="4"/>' + bgFace(34, 44, .9) + '</g>' +
-  /* starfish */ '<g transform="translate(160 680)"><path d="M34 0 L42 24 L68 26 L48 42 L56 68 L34 52 L12 68 L20 42 L0 26 L26 24 Z" fill="#F7B27A"/>' + bgFace(34, 36, .8) + '</g>' +
-  /* snorkel */ '<g transform="translate(36 760)"><rect x="0" y="10" width="62" height="32" rx="16" fill="#B9DDF0"/><path d="M31 10 V42" fill="none"/><path d="M68 12 V-14 Q68 -22 76 -22" fill="none" stroke="#F5B940" stroke-width="5"/></g>' +
-  /* crab */ '<g transform="translate(296 760)"><ellipse cx="36" cy="30" rx="28" ry="18" fill="#F28B82"/><path d="M10 20 q-14 -14 -4 -24 q2 10 10 8 M62 20 q14 -14 4 -24 q-2 10 -10 8" fill="#F28B82"/>' + bgFace(36, 28, .9) + '</g>' +
-  '</g><g opacity=".32">' + bgSpark(150, 60, '#F5D07A') + bgSpark(260, 110, '#8FB8DE') + bgSpark(120, 210, '#F5D07A') + bgSpark(390, 330, '#F28B82') + bgSpark(250, 460, '#8FB8DE') + bgSpark(120, 530, '#F5D07A') + bgSpark(380, 550, '#8ED1A0') + bgSpark(100, 700, '#F28B82') + bgSpark(250, 810, '#F5D07A') + '</g></svg>';
-const svgUrl = s => 'url("data:image/svg+xml,' + encodeURIComponent(s) + '")';
-document.documentElement.style.setProperty('--bg-hokkaido', svgUrl(BG_HOKKAIDO));
-document.documentElement.style.setProperty('--bg-ishigaki', svgUrl(BG_ISHIGAKI));
+/* 插圖：Microsoft Fluent Emoji（MIT License）https://github.com/microsoft/fluentui-emoji */
+const FE = k => 'fe-' + k + '.webp';
+const BG_SETS = {
+  hokkaido: ['snowman','fox','cocoa','penguin','mountain','owl','ramen','skis','bird','onsen','gloves','polarbear','tramway','crab','scarf','tree','seal','shavedice','skate','xmastree','lantern','sushi','gift','snowflake'],
+  ishigaki: ['sun','palm','turtle','hibiscus','fish','shell','pineapple','coconut','beach','dolphin','coral','mango','drink','mask','shrimp','star','sailboat','wave','cloud']
+};
+let BG_TRIP = null;
+function renderBgArt(trip, force){
+  const box = document.getElementById('bgart'); if (!box) return;
+  if (!force && trip === BG_TRIP) return; BG_TRIP = trip;
+  const list = BG_SETS[trip] || []; if (!list.length) { box.innerHTML = ''; return; }
+  const W = window.innerWidth, H = window.innerHeight, cw = W < 700 ? 118 : 150, ch = W < 700 ? 132 : 150;
+  let seed = trip === 'hokkaido' ? 7 : 13; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  let h = '', n = 0;
+  for (let y = 0; y < H + ch; y += ch) for (let x = 0, r = Math.round(y / ch); x < W + cw; x += cw) {
+    const k = list[n++ % list.length], sz = Math.round(44 + rnd() * 18);
+    const px = x + (r % 2 ? cw / 2 : 0) + (rnd() - .5) * cw * .35 - sz / 2, py = y + (rnd() - .5) * ch * .3;
+    h += '<img src="' + FE(k) + '" alt="" style="left:' + px.toFixed(0) + 'px;top:' + py.toFixed(0) + 'px;width:' + sz + 'px;height:' + sz + 'px;transform:rotate(' + ((rnd() - .5) * 24).toFixed(0) + 'deg)">';
+  }
+  box.innerHTML = h;
+}
+let BG_RT; window.addEventListener('resize', () => { clearTimeout(BG_RT); BG_RT = setTimeout(() => renderBgArt(BG_TRIP, true), 200); });
 const MENU_ART = {
-  'hokkaido-2026': '<svg class="dr-art" viewBox="0 0 120 64" aria-hidden="true"><path d="M8 58 L34 22 L46 36 L62 14 L92 58 Z" fill="#C7D0D3" stroke="#393833" stroke-width="1.4" stroke-linejoin="round"/><path d="M55 23 L62 14 L69 23 Q65 26 62 23 Q59 26 55 23Z" fill="#fff" stroke="#393833" stroke-width="1.2"/><path d="M98 22 L108 40 H88 Z M98 32 L111 54 H85 Z" fill="#B5C6AE" stroke="#393833" stroke-width="1.2" stroke-linejoin="round"/><g stroke="#6E8FA6" stroke-width="1.4" stroke-linecap="round"><path d="M20 8 v10 M15.7 10.5 24.3 15.5 M15.7 15.5 24.3 10.5"/><path d="M84 6 v8 M80.5 8 87.5 12 M80.5 12 87.5 8"/></g></svg>',
-  'ishigaki': '<svg class="dr-art" viewBox="0 0 120 64" aria-hidden="true"><circle cx="96" cy="16" r="9" fill="#F1DCA7" stroke="#393833" stroke-width="1.2"/><path d="M0 50 q10 -8 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 V64 H0Z" fill="#C8D9E2"/><path d="M28 50 Q32 32 28 18" stroke="#A07A5A" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M28 18 q-12 -2 -18 6 M28 18 q-4 -12 -16 -12 M28 18 q8 -10 20 -4 M28 18 q14 0 16 12" stroke="#87A07F" stroke-width="3.5" fill="none" stroke-linecap="round"/><g transform="translate(66 44)"><ellipse cx="10" cy="6" rx="10" ry="6" fill="#B5C6AE" stroke="#393833" stroke-width="1.2"/><circle cx="22" cy="5" r="3.5" fill="#B5C6AE" stroke="#393833" stroke-width="1.2"/></g></svg>'
+  'hokkaido-2026': '<span class="dr-art" aria-hidden="true"><img src="' + FE('mountain') + '" alt=""><img src="' + FE('snowman') + '" alt=""><img src="' + FE('snowflake') + '" alt=""></span>',
+  'ishigaki': '<span class="dr-art" aria-hidden="true"><img src="' + FE('palm') + '" alt=""><img src="' + FE('turtle') + '" alt=""><img src="' + FE('sun') + '" alt=""></span>'
 };
 
 const TRIPS = [
@@ -442,6 +457,7 @@ function renderNav(cur){
   document.getElementById('menuClose').addEventListener('click', closeMenu);
   const isH = TRIPS[0].views.test(cur);
   document.body.dataset.trip = isH ? 'hokkaido' : 'ishigaki';
+  renderBgArt(isH ? 'hokkaido' : 'ishigaki');
   document.getElementById('brandName').textContent = isH ? '冬雪北海道' : '石垣島';
   document.getElementById('brand').setAttribute('href', isH ? '#overview' : '#ishigaki');
   const tn = document.getElementById('topnav'); tn.hidden = !isH;
@@ -450,14 +466,7 @@ function renderNav(cur){
 }
 function renderIshigaki(){
   let h = '<section class="stagehead" style="--c:var(--blue)"><div class="kicker"><b>NEXT TRIP</b>　下一趟旅程</div><h1>石垣島</h1><div class="route">日期未定・行程規劃中</div></section>';
-  h += '<div class="isle"><svg viewBox="0 0 320 170" role="img" aria-label="石垣島插圖">' +
-    '<circle cx="250" cy="44" r="20" fill="color-mix(in srgb,var(--mustard) 70%,var(--paper))" stroke="var(--ink)" stroke-width="1.4"/><circle cx="244" cy="42" r="1.4" fill="var(--ink)"/><circle cx="256" cy="42" r="1.4" fill="var(--ink)"/><path d="M246 48 q4 3 8 0" stroke="var(--ink)" stroke-width="1.2" fill="none" stroke-linecap="round"/>' +
-    '<path d="M40 118 Q90 70 150 96 Q200 74 262 118 Z" fill="color-mix(in srgb,var(--sage) 55%,var(--paper))" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>' +
-    '<path d="M104 96 q2 -22 -4 -36" stroke="#A07A5A" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M100 60 q-16 -4 -24 6 M100 60 q-6 -14 -20 -14 M100 60 q12 -10 24 -4 M100 60 q16 2 20 14" stroke="var(--sage)" stroke-width="4" fill="none" stroke-linecap="round"/>' +
-    '<path d="M0 124 q20 -10 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 V170 H0 Z" fill="color-mix(in srgb,var(--blue) 35%,var(--paper))"/>' +
-    '<path d="M20 146 q10 -6 20 0 q10 -6 20 0 M150 152 q10 -6 20 0 q10 -6 20 0 M250 142 q10 -6 20 0" stroke="var(--paper)" stroke-width="2" fill="none" stroke-linecap="round"/>' +
-    '<g transform="translate(206 140)"><ellipse cx="0" cy="0" rx="14" ry="9" fill="var(--sage)" stroke="var(--ink)" stroke-width="1.3"/><circle cx="16" cy="-2" r="5" fill="var(--sage)" stroke="var(--ink)" stroke-width="1.3"/><circle cx="17.5" cy="-3" r="1" fill="var(--ink)"/><path d="M-6 -4 l6 -3 6 3 -6 3z" fill="none" stroke="var(--ink)" stroke-width="1"/></g>' +
-    '</svg></div>';
+  h += '<div class="isle" role="img" aria-label="石垣島插圖"><img src="' + FE('sun') + '" alt="" class="i-sun"><img src="' + FE('palm') + '" alt="" class="i-palm"><img src="' + FE('beach') + '" alt="" class="i-beach"><img src="' + FE('turtle') + '" alt="" class="i-turtle"><img src="' + FE('fish') + '" alt="" class="i-fish"><img src="' + FE('hibiscus') + '" alt="" class="i-hib"></div>';
   h += '<div class="soon-card"><strong>地圖建置中</strong><p>決定好日期、住宿和想去的地方後告訴我，我就幫這趟做出專屬的地圖、每日行程和記帳本。</p></div>';
   h += '<div class="pager"><a href="#overview">← 冬雪北海道</a></div><div class="spacer"></div>';
   return h;
@@ -500,32 +509,25 @@ const AV = {
   jun: '<g><rect x="-5" y="-8.5" width="10" height="8.5" rx="3.5" fill="#C48A80"/><rect x="-5.5" y="-9.4" width="11" height="2.6" rx="1.3" fill="#C39B4F"/><circle cx="0" cy="-14" r="6.6" fill="#F2D6BE"/><path d="M-6.6 -13 q0 -8 6.6 -8 q6.6 0 6.6 8 q-3 -3.5 -6.6 -3.2 q-3.6 -.3 -6.6 3.2z" fill="#5B4636"/><path d="M-6.9 -15 a6.9 6.9 0 0 1 13.8 0 z" fill="#C48A80"/><circle cx="-6.6" cy="-13" r="2.1" fill="#F7F3EC"/><circle cx="6.6" cy="-13" r="2.1" fill="#F7F3EC"/><circle cx="-2.4" cy="-11.6" r=".95" fill="#3A3833"/><circle cx="2.4" cy="-11.6" r=".95" fill="#3A3833"/><circle cx="-4.1" cy="-9.8" r="1.1" fill="#E7A9A0" opacity=".85"/><circle cx="4.1" cy="-9.8" r="1.1" fill="#E7A9A0" opacity=".85"/></g>'
 };
 function teamSVG(){
-  return '<g id="team" style="display:none"><ellipse cx="0" cy="1.5" rx="24" ry="3" fill="var(--ink)" opacity=".12"/>' +
-    '<g class="mem" transform="translate(-15 0)">' + AV.raccoon + '</g><g class="mem" transform="translate(0 0)">' + AV.hsiao + '</g><g class="mem" transform="translate(15 0)">' + AV.jun + '</g></g>';
+  const m = (k, x, c) => '<ellipse cx="' + x + '" cy="1" rx="8" ry="2.6" fill="' + c + '" opacity=".8"/><image href="' + FE(k) + '" x="' + (x - 10) + '" y="-21" width="20" height="20"/>';
+  return '<g id="team" style="display:none">' + m('raccoon', -19, 'var(--plum)') + m('person', 0, 'var(--blue)') + m('person', 19, 'var(--rose)') + '</g>';
 }
 function planeSVG(){
-  const face = (x, c, cap) => '<circle cx="' + x + '" cy="-1" r="4.6" fill="#DCE8EE" stroke="var(--ink)" stroke-width="1"/><circle cx="' + x + '" cy="0" r="2.8" fill="' + c + '"/>' + (cap ? '<path d="M' + (x-2.9) + ' -.4 a2.9 2.9 0 0 1 5.8 0z" fill="' + cap + '"/>' : '<ellipse cx="' + x + '" cy=".1" rx="2.6" ry="1" fill="#4F4B45"/>');
-  return '<g id="plane" style="display:none"><g class="pbody">' +
-    '<path d="M-30 -4 L-40 -16 L-33 -16 L-20 -6 Z" fill="var(--rose)" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round"/>' +
-    '<rect x="-34" y="-9" width="66" height="17" rx="8.5" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.4"/>' +
-    '<path d="M-4 5 L-14 17 L-6 17 L8 6 Z" fill="var(--blue)" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round"/>' +
-    face(-16, '#A29D94', null) + face(-4, '#F2D6BE', '#6E8FA6') + face(8, '#F2D6BE', '#C48A80') +
-    '<circle cx="24" cy="-2" r="1.3" fill="var(--ink)"/><path d="M22 2.5 q2.5 2 5 0" stroke="var(--ink)" stroke-width="1" fill="none" stroke-linecap="round"/><circle cx="20" cy="1.5" r="1.5" fill="#E7A9A0" opacity=".8"/>' +
-    '</g></g>';
+  return '<g id="plane" style="display:none"><g class="pbody"><image href="' + FE('airplane') + '" x="-30" y="-30" width="60" height="60"/></g></g>';
 }
 function renderWorld(){
   const W = WM.W, top = WM.top, gap = WM.gap, pts = WM.pts, H = WM.H;
   let path = ''; for (let i = 0; i <= pts.length; i++) path += segD(i).replace(/^M [\d.]+ [\d.]+/, i ? '' : '$&') + ' ';
   let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="十天的旅程路線圖">';
   const zone = (y0, y1, label, fill, side) => {
-    s += '<rect x="10" y="' + y0 + '" width="340" height="' + (y1-y0) + '" rx="18" fill="' + fill + '" opacity=".55"/>';
+    s += '<rect x="10" y="' + y0 + '" width="340" height="' + (y1-y0) + '" rx="18" fill="' + fill + '" opacity=".95"/>';
     s += '<text class="region" x="' + (side==='r' ? 338 : 22) + '" y="' + (y0+24) + '" text-anchor="' + (side==='r'?'end':'start') + '">' + label + '</text>';
   };
   zone(top-58, top+46, '札幌市區', 'var(--land)', 'r');
-  zone(top+gap-48, top+3*gap+50, '札幌國際滑雪場', 'color-mix(in srgb,var(--blue) 14%,transparent)', 'l');
-  zone(top+5*gap-48, top+6*gap+50, '富良野', 'color-mix(in srgb,var(--sage) 18%,transparent)', 'l');
+  zone(top+gap-48, top+3*gap+50, '札幌國際滑雪場', 'color-mix(in srgb,var(--blue) 24%,var(--paper))', 'l');
+  zone(top+5*gap-48, top+6*gap+50, '富良野', 'color-mix(in srgb,var(--sage) 28%,var(--paper))', 'l');
   zone(top+8*gap-48, top+8*gap+46, '小樽', 'var(--sea)', 'r');
-  zone(top+9*gap-48, top+9*gap+52, '新千歲機場', 'color-mix(in srgb,var(--plum) 14%,transparent)', 'r');
+  zone(top+9*gap-48, top+9*gap+52, '新千歲機場', 'color-mix(in srgb,var(--plum) 22%,var(--paper))', 'r');
   const ink = 'stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"';
   const face = (x,y,sc) => '<g transform="translate(' + x + ' ' + y + ') scale(' + (sc||1) + ')"><circle cx="-3.2" cy="0" r="1.1" fill="var(--ink)"/><circle cx="3.2" cy="0" r="1.1" fill="var(--ink)"/><path d="M-1.6 2.2 q1.6 1.4 3.2 0" stroke="var(--ink)" stroke-width="1" fill="none" stroke-linecap="round"/><circle cx="-5.6" cy="2" r="1.4" fill="#E7A9A0" opacity=".7"/><circle cx="5.6" cy="2" r="1.4" fill="#E7A9A0" opacity=".7"/></g>';
   const mtn = (x,y,sc,happy) => s += '<g transform="translate(' + x + ' ' + y + ') scale(' + sc + ')"><path d="M0 36 Q4 30 10 20 L22 4 Q27 -1 32 4 L46 22 Q52 30 58 36 Z" fill="color-mix(in srgb,var(--blue) 35%,var(--paper))" ' + ink + '/><path d="M15 15 L22 4 Q27 -1 32 4 L39 13 Q35 17 31 13 Q27 18 23 13 Q19 18 15 15 Z" fill="#fff" ' + ink + '/>' + (happy ? face(27, 24, .9) : '') + '</g>';
@@ -544,15 +546,16 @@ function renderWorld(){
   const lamp = (x,y) => s += '<g transform="translate(' + x + ' ' + y + ')"><path d="M8 12 V40 M3 40 h10" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"/><path d="M2 4 h12 l-2 8 h-8z" fill="color-mix(in srgb,var(--mustard) 60%,var(--paper))" ' + ink + '/><path d="M4 4 l4 -4 4 4" fill="none" ' + ink + '/></g>';
   const suitcase = (x,y) => s += '<g transform="translate(' + x + ' ' + y + ')"><rect x="0" y="6" width="24" height="20" rx="3" fill="color-mix(in srgb,var(--plum) 45%,var(--paper))" ' + ink + '/><path d="M8 6 V2 h8 v4" fill="none" ' + ink + '/><circle cx="16" cy="16" r="3" fill="var(--rose)"/><circle cx="5" cy="27" r="1.6" fill="var(--ink)"/><circle cx="19" cy="27" r="1.6" fill="var(--ink)"/></g>';
   const wave = (x,y) => s += '<path d="M' + x + ' ' + y + ' q 6 -7 12 0 q 6 -7 12 0 q 6 -7 12 0 q 6 -7 12 0" fill="none" stroke="var(--blue)" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>';
-  tower(26, top-30); cloud(196, top-48, .8);
-  mtn(18, top+gap+8, .9, true); penguin(34, top+2*gap+12); ramen(286, top+2*gap+50); flake(336, top+gap+66); flake(336, top+3*gap+50); parfait(132, top+2*gap+30);
-  torii(288, top+4*gap-14);
-  tree(24, top+5*gap+14); gondola(298, top+5*gap+34); tree(40, top+6*gap+6, .9); mtn(288, top+5*gap-46, .7, true); snowman(104, top+5*gap+40); flake(332, top+6*gap+40);
-  bus(34, top+7*gap-14);
-  wave(232, top+8*gap+30); wave(250, top+8*gap+42); boat(258, top+8*gap-6); lamp(318, top+8*gap+2);
-  cloud(26, top+9*gap+14, .8); suitcase(292, top+9*gap+22);
-  s += '<path d="' + path + '" fill="none" stroke="var(--paper)" stroke-width="9" stroke-linecap="round"/>';
-  s += '<path d="' + path + '" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"/>';
+  const img = (k, x, y, w) => s += '<image href="' + FE(k) + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + w + '"/>';
+  img('tower', 22, top-44, 46); img('cloud', 192, top-58, 40);
+  img('mountain', 14, top+gap+2, 52); img('penguin', 24, top+2*gap+4, 44); img('ramen', 282, top+2*gap+42, 42); img('softice', 126, top+2*gap+22, 40); img('snowflake', 324, top+gap+50, 30); img('snowflake', 326, top+3*gap+36, 26);
+  img('shrine', 282, top+4*gap-24, 46);
+  img('tree', 18, top+5*gap+4, 42); img('tramway', 292, top+5*gap+24, 46); img('onsen', 28, top+6*gap-4, 42); img('skier', 288, top+5*gap-52, 42); img('snowman', 98, top+5*gap+32, 42); img('snowflake', 326, top+6*gap+30, 26);
+  img('bus', 28, top+7*gap-22, 44);
+  img('wave', 232, top+8*gap+10, 42); img('sailboat', 274, top+8*gap-22, 42); img('chocolate', 318, top+8*gap+6, 32);
+  img('cloud', 20, top+9*gap+6, 42); img('luggage', 288, top+9*gap+14, 38);
+  s += '<path d="' + path + '" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round"/>';
+  s += '<path d="' + path + '" fill="none" stroke="var(--ink)" stroke-width="3.2" stroke-dasharray="1 8" stroke-linecap="round"/>';
   for (let i = 0; i <= pts.length; i++) s += '<path id="seg' + i + '" d="' + segD(i) + '" fill="none" stroke="none"/>';
   s += '<g transform="translate(180 36)"><rect x="-58" y="-16" width="116" height="30" rx="3" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/><text class="sm" x="0" y="4" text-anchor="middle" style="fill:var(--ink);font-weight:700">START｜桃園 ✈</text></g>';
   s += '<g transform="translate(180 ' + (H-48) + ')"><rect x="-54" y="-16" width="108" height="30" rx="3" fill="var(--ink)"/><text class="sm" x="0" y="4" text-anchor="middle" style="fill:var(--paper);font-weight:700;letter-spacing:.14em">GOAL｜返台</text></g>';
@@ -646,13 +649,13 @@ function renderOverview(){
   let h = '<section class="intro"><div class="kicker">2026.11.24 — 12.03 ／ 10 STAGES</div><h1>冬雪北海道</h1><p>札幌・札幌國際・富良野・小樽</p>';
   if (!ti && du > 0) h += '<div class="count">距離出發還有 <b>' + du + '</b> 天</div>';
   h += '</section><div class="world">' + renderWorld() + '</div>';
-  h += '<div class="legend"><span><i style="background:var(--paper)"></i>未出發</span><span><i style="background:var(--rose)"></i>今天</span><span class="crew"><svg viewBox="-24 -26 48 30" width="46" height="29" aria-hidden="true">' + teamSVG().replace(' id="team" style="display:none"', '') + '</svg>浣熊・蕭・君</span><button class="playbtn" id="playbtn" type="button" aria-label="播放動畫" title="播放動畫">▶</button></div>';
+  h += '<div class="legend"><span><i style="background:var(--paper)"></i>未出發</span><span><i style="background:var(--rose)"></i>今天</span><span class="crew"><svg viewBox="-30 -24 60 28" width="60" height="28" aria-hidden="true">' + teamSVG().replace(' id="team" style="display:none"', '') + '</svg>浣熊・蕭・君</span><button class="playbtn" id="playbtn" type="button" aria-label="播放動畫" title="播放動畫">▶</button></div>';
   h += '<details class="fold hlfold"><summary>本次亮點</summary><ul class="hl">' +
     '<li style="--c:var(--blue)"><strong>粉雪滑雪</strong><span>連滑札幌國際與富良野，雪具寄放、Ski-in Ski-out 輕裝上陣。</span></li>' +
     '<li style="--c:var(--rose)"><strong>溫泉旅宿</strong><span>ぽんの湯、紫彩之湯與 Keio Prelia 大浴場，每關結束都能回血。</span></li>' +
     '<li style="--c:var(--mustard)"><strong>道地美食</strong><span>成吉思汗、湯咖哩、味噌拉麵、三角市場海鮮丼與夜聖代。</span></li>' +
     '<li style="--c:var(--plum)"><strong>燈彩人文</strong><span>AOAO 水族館、白色燈樹節、小樽運河與白色戀人點燈。</span></li></ul></details>';
-  h += '<p class="endnote">營業時間依 2026 年查到的資料整理，部分為往年慣例，出發前一週請再到各官網確認。地圖按鈕會開啟 Google 地圖。</p><div class="spacer"></div>';
+  h += '<p class="endnote">營業時間依 2026 年查到的資料整理，部分為往年慣例，出發前一週請再到各官網確認。地圖按鈕會開啟 Google 地圖。插圖：Microsoft Fluent Emoji（MIT 授權）。</p><div class="spacer"></div>';
   return h;
 }
 
@@ -778,7 +781,7 @@ function renderLedgerShell(){
   }
   h += '<details class="fold mfold"><summary>分帳結算<small id="settlesum"></small></summary><div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><button type="button" class="ratebtn" id="rateBtn">自動帶入</button><span class="ratenote" id="ratenote">' + rateNote() + '</span></div><div id="settle"></div></details>';
   h += '<details class="fold mfold"><summary>花費分類</summary><div id="bars"></div></details>';
-  h += '<h2>明細<small class="h2note">點一筆可以修改</small></h2><div id="spent"></div><div id="ledger"></div>';
+  h += '<details class="fold mfold ledfold" open><summary>明細<small id="ledsum"></small></summary><p class="h2note in">點一筆可以修改</p><div id="spent"></div><div id="ledger"></div></details>';
   return h;
 }
 function renderLedger(){
@@ -811,6 +814,7 @@ function renderLedger(){
     h += '</li>';
   }
   document.getElementById('ledger').innerHTML = list.length ? '<ul class="ledger">' + h + '</ul>' : '';
+  const ls = document.getElementById('ledsum'); if (ls) ls.textContent = list.length ? '共 ' + list.length + ' 筆・NT$ ' + fmt(all) : '';
 }
 function renderSettle(list){
   const box = document.getElementById('settle'); if (!box) return;
@@ -1004,6 +1008,7 @@ function show(){
   if (!/^(overview|cost|ishigaki|day([1-9]|10))$/.test(id)) id = 'overview';
   const view = document.getElementById('view');
   view.classList.remove('view'); void view.offsetWidth; view.classList.add('view');
+  view.className = 'wrap view v-' + (/^day/.test(id) ? 'day' : id);
   view.innerHTML = id === 'overview' ? renderOverview() : id === 'cost' ? renderCost() : id === 'ishigaki' ? renderIshigaki() : renderDay(DAYS[Number(id.slice(3)) - 1]);
   renderNav(id); window.scrollTo(0, 0);
   ANIM++;
