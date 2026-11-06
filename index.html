@@ -529,9 +529,7 @@ async function playAll(){
 function renderOverview(){
   const ti = todayIndex(), du = daysUntil();
   let h = '<section class="intro"><div class="kicker">2026.11.24 — 12.03 ／ 10 STAGES</div><h1>冬雪北海道</h1><p>札幌・札幌國際・富良野・小樽</p>';
-  if (ti) h += '<a class="count" href="#day' + ti + '" style="text-decoration:none">今天挑戰 <b>STAGE ' + ti + '</b></a>';
-  else if (du > 0) h += '<div class="count">距離出發還有 <b>' + du + '</b> 天</div>';
-  else h += '<div class="count">ALL CLEAR｜下次雪季見</div>';
+  if (!ti && du > 0) h += '<div class="count">距離出發還有 <b>' + du + '</b> 天</div>';
   h += '</section><div class="world">' + renderWorld() + '</div>';
   h += '<div class="legend"><span><i style="background:var(--paper)"></i>未出發</span><span><i style="background:var(--rose)"></i>今天</span><span class="crew"><svg viewBox="-24 -26 48 30" width="46" height="29" aria-hidden="true">' + teamSVG().replace(' id="team" style="display:none"', '') + '</svg>浣熊・蕭・君</span><button class="playbtn" id="playbtn" type="button" aria-label="播放動畫" title="播放動畫">▶</button></div>';
   h += '<details class="fold hlfold"><summary>本次冒險亮點</summary><ul class="hl">' +
