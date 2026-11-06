@@ -258,6 +258,7 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .ledger .e.on{border-color:var(--mustard);box-shadow:inset 3px 0 0 var(--mustard)}
 .ledger .nm em{font-style:normal;color:var(--mustard)}
 .pend{margin-top:6px;font-size:12.5px;color:var(--mustard)}
+.spent .tw{font-family:var(--type);font-size:15px;color:var(--muted);margin-top:2px}
 .h2note{font-size:12px;color:var(--muted);letter-spacing:0;font-weight:400}
 /* folds */
 .fold{margin:20px 18px 0;background:var(--paper);border:1px solid var(--line);border-radius:4px}
@@ -634,13 +635,13 @@ const CATS = [['餐飲','var(--rose)'],['交通','var(--blue)'],['滑雪','var(-
 const CATC = Object.fromEntries(CATS);
 const WHO = [['浣熊','var(--plum)'],['蕭','var(--blue)'],['君','var(--rose)']];
 const PEOPLE = WHO.map(w => w[0]);
-const L = { list: [], rate: 0.215, mode: 'local', canWrite: true, db: null, cur: 'JPY', cat: '餐飲', who: '', split: PEOPLE.slice(), editing: null };
-try { const r = Number(localStorage.getItem('hk-rate')); if (r > 0) L.rate = r; } catch (e) {}
+const L = { list: [], rate: 0.205, mode: 'local', canWrite: true, db: null, cur: 'JPY', cat: '餐飲', who: '', split: PEOPLE.slice(), editing: null };
 function loadLocal(){ try { L.list = JSON.parse(localStorage.getItem('hk-ledger') || '[]') || []; } catch (e) { L.list = []; } }
 function saveLocal(){ try { localStorage.setItem('hk-ledger', JSON.stringify(L.list)); } catch (e) {} }
 loadLocal();
 function fmt(n){ return Math.round(n).toLocaleString('en-US'); }
 function toTWD(e){ return e.cur === 'TWD' ? e.amount : e.amount * L.rate; }
+function toJPY(e){ return e.cur === 'TWD' ? e.amount / L.rate : e.amount; }
 function defaultDay(){ const ti = todayIndex(); return ti ? String(ti) : '0'; }
 function splitOf(e){ const s = Array.isArray(e.split) ? e.split.filter(p => PEOPLE.includes(p)) : []; return s.length ? s : PEOPLE.slice(); }
 function chips(kind, list, isOn){ return list.map(([n,c]) => '<button type="button" data-' + kind + '="' + n + '" style="--c:' + c + '" aria-pressed="' + isOn(n) + '">' + n + '</button>').join(''); }
@@ -658,7 +659,7 @@ function renderLedgerShell(){
     h += '<div><label>誰要分攤<small>（可多選）</small></label><div class="chips" id="splitchips" role="group" aria-label="誰要分攤">' + chips('split', WHO, n => L.split.includes(n)) + '</div></div>';
     h += '<button class="addbtn" id="addbtn" type="submit">' + (L.editing ? '儲存修改' : '記一筆') + '</button><div class="msg" id="msg" role="status"></div></form>';
   }
-  h += '<div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><span>（只影響換算顯示）</span></div>';
+  h += '<div class="rate">匯率固定 1 円 ＝ NT$ ' + L.rate + '，三人統一換算</div>';
   h += '<h2>分帳結算</h2><div id="settle"></div>';
   h += '<h2>花費分類</h2><div id="bars"></div>';
   h += '<h2>明細<small class="h2note">點一筆可以修改</small></h2><div id="ledger"></div>';
@@ -668,25 +669,25 @@ function renderLedger(){
   const sp = document.getElementById('spent'); if (!sp) return;
   const list = L.list;
   let jpy = 0, twd = 0, all = 0, pend = 0;
-  for (const e of list) { if (e.cur === 'TWD') twd += e.amount; else jpy += e.amount; all += toTWD(e); if (e._pending) pend++; }
-  sp.innerHTML = '<div class="spent"><div class="k">TOTAL SPENT</div><div class="big">NT$ ' + fmt(all) + '</div><div class="row"><span>日圓 <b>' + fmt(jpy) + ' 円</b></span><span>台幣 <b>NT$ ' + fmt(twd) + '</b></span><span>每人平均 <b>NT$ ' + fmt(all/3) + '</b></span><span>共 <b>' + list.length + '</b> 筆</span></div>' + (pend ? '<div class="pend">有 ' + pend + ' 筆等網路恢復後自動上傳</div>' : '') + '</div>';
-  const byCat = {}; for (const e of list) byCat[e.cat] = (byCat[e.cat] || 0) + toTWD(e);
+  for (const e of list) { if (e.cur === 'TWD') twd += e.amount; else jpy += e.amount; all += toJPY(e); if (e._pending) pend++; }
+  sp.innerHTML = '<div class="spent"><div class="k">TOTAL SPENT</div><div class="big">' + fmt(all) + ' 円</div><div class="tw">換成台幣 ≈ NT$ ' + fmt(all * L.rate) + '</div><div class="row"><span>每人平均 <b>' + fmt(all/3) + ' 円</b></span><span>共 <b>' + list.length + '</b> 筆</span>' + (twd ? '<span>含台幣支出 <b>NT$ ' + fmt(twd) + '</b></span>' : '') + '</div>' + (pend ? '<div class="pend">有 ' + pend + ' 筆等網路恢復後自動上傳</div>' : '') + '</div>';
+  const byCat = {}; for (const e of list) byCat[e.cat] = (byCat[e.cat] || 0) + toJPY(e);
   const max = Math.max(1, ...Object.values(byCat));
-  document.getElementById('bars').innerHTML = list.length ? '<div class="bars">' + CATS.filter(([n]) => byCat[n]).map(([n,c]) => '<div class="r"><span>' + n + '</span><span class="t"><i style="width:' + (byCat[n]/max*100).toFixed(1) + '%;background:' + c + '"></i></span><b>NT$ ' + fmt(byCat[n]) + '</b></div>').join('') + '</div>' : '<div class="empty">還沒有記錄，記下第一筆吧</div>';
+  document.getElementById('bars').innerHTML = list.length ? '<div class="bars">' + CATS.filter(([n]) => byCat[n]).map(([n,c]) => '<div class="r"><span>' + n + '</span><span class="t"><i style="width:' + (byCat[n]/max*100).toFixed(1) + '%;background:' + c + '"></i></span><b>' + fmt(byCat[n]) + ' 円</b></div>').join('') + '</div>' : '<div class="empty">還沒有記錄，記下第一筆吧</div>';
   renderSettle(list);
   const groups = {}; for (const e of list) (groups[e.day] = groups[e.day] || []).push(e);
   const order = Object.keys(groups).map(Number).sort((a,b) => (b||99) - (a||99));
   let h = '';
   for (const k of order) {
     const g = groups[k].sort((a,b) => (b.ts||0) - (a.ts||0));
-    const sum = g.reduce((s,e) => s + toTWD(e), 0);
+    const sum = g.reduce((s,e) => s + toJPY(e), 0);
     const d = DAYS[k-1];
-    h += '<li><div class="dh"><span>' + (d ? 'DAY ' + k + '・' + md(d) : '行前／其他') + '</span><span>NT$ ' + fmt(sum) + '</span></div>';
+    h += '<li><div class="dh"><span>' + (d ? 'DAY ' + k + '・' + md(d) : '行前／其他') + '</span><span>' + fmt(sum) + ' 円</span></div>';
     for (const e of g) {
       const sp2 = splitOf(e), partial = sp2.length < PEOPLE.length;
       h += '<div class="e' + (L.editing === e.id ? ' on' : '') + '"><span class="dot" style="background:' + (CATC[e.cat] || 'var(--muted)') + '"></span>';
       h += (L.canWrite ? '<button type="button" class="nm" data-edit="' + esc(e.id) + '" aria-label="修改 ' + esc(e.item || e.cat) + '">' : '<span class="nm">') + esc(e.item || e.cat) + '<small>' + esc(e.cat) + (e.who ? '・' + esc(e.who) + ' 付' : '') + (partial ? '・' + sp2.join('、') + ' 分' : '') + (e._pending ? '・<em>待上傳</em>' : '') + '</small>' + (L.canWrite ? '</button>' : '</span>');
-      h += '<span class="am">' + (e.cur === 'TWD' ? 'NT$ ' + fmt(e.amount) : fmt(e.amount) + ' 円') + (e.cur === 'JPY' ? '<small>≈ NT$ ' + fmt(toTWD(e)) + '</small>' : '') + '</span>';
+      h += '<span class="am">' + (e.cur === 'TWD' ? 'NT$ ' + fmt(e.amount) + '<small>≈ ' + fmt(toJPY(e)) + ' 円</small>' : fmt(e.amount) + ' 円') + '</span>';
       h += L.canWrite ? '<button class="del" type="button" data-id="' + esc(e.id) + '" aria-label="刪除 ' + esc(e.item || e.cat) + '">×</button>' : '<span></span>';
       h += '</div>';
     }
@@ -701,16 +702,16 @@ function renderSettle(list){
   let shared = 0, skipped = 0;
   for (const e of list) {
     if (!(e.who in paid)) { skipped++; continue; }
-    const v = toTWD(e), m = splitOf(e);
+    const v = toJPY(e), m = splitOf(e);
     paid[e.who] += v; shared += v;
     for (const p of m) owe[p] += v / m.length;
   }
-  let h = '<div class="who-tbl"><div class="r"><span>成員</span><span>先付</span><span>應分擔</span><span>差額</span></div>';
+  let h = '<div class="who-tbl"><div class="r"><span>成員（円）</span><span>先付</span><span>應分擔</span><span>差額</span></div>';
   for (const p of PEOPLE) {
     const d = paid[p] - owe[p];
     h += '<div class="r"><span class="p"><i style="background:' + col[p] + '"></i>' + p + '</span><span>' + fmt(paid[p]) + '</span><span>' + fmt(owe[p]) + '</span><b class="' + (d > 0.5 ? 'pos' : d < -0.5 ? 'neg' : '') + '">' + (d > 0.5 ? '+' : d < -0.5 ? '−' : '') + fmt(Math.abs(d)) + '</b></div>';
   }
-  h += '<div class="r"><span>合計（NT$）</span><span>' + fmt(shared) + '</span><span>' + fmt(shared) + '</span><span></span></div></div>';
+  h += '<div class="r"><span>合計</span><span>' + fmt(shared) + '</span><span>' + fmt(shared) + '</span><span></span></div></div>';
   const cred = [], debt = [];
   for (const p of PEOPLE) { const d = paid[p] - owe[p]; if (d > 0.5) cred.push([p, d]); else if (d < -0.5) debt.push([p, -d]); }
   cred.sort((a,b) => b[1]-a[1]); debt.sort((a,b) => b[1]-a[1]);
@@ -721,7 +722,7 @@ function renderSettle(list){
   }
   if (!shared) h += '<div class="even">還沒有分帳資料，記帳時選「誰先付的」就會自動算</div>';
   else if (!tr.length) h += '<div class="even">目前大家打平，不用轉帳</div>';
-  else h += '<div class="xfer">' + tr.map(([a,b,x]) => '<div><span class="p">' + a + '</span><span class="arrow">付給 →</span><span class="p">' + b + '</span><span class="amt">NT$ ' + fmt(x) + '<small>≈ ' + fmt(x / L.rate) + ' 円</small></span></div>').join('') + '</div>';
+  else h += '<div class="xfer">' + tr.map(([a,b,x]) => '<div><span class="p">' + a + '</span><span class="arrow">付給 →</span><span class="p">' + b + '</span><span class="amt">NT$ ' + fmt(x * L.rate) + '<small>' + fmt(x) + ' 円 × ' + L.rate + '</small></span></div>').join('') + '</div>';
   if (skipped) h += '<p class="skip">有 ' + skipped + ' 筆沒有選付款人，未列入分帳。</p>';
   box.innerHTML = h;
 }
