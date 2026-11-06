@@ -494,7 +494,14 @@ function renderCost(){
    1. 到 https://console.firebase.google.com 建立專案 → 新增「網頁應用程式」→ 複製 firebaseConfig 貼到下面
    2. 建立 Firestore 資料庫，並把安全規則設成 README 裡的內容
    沒填（null）時，記帳只會存在各自手機上 */
-const FIREBASE_CONFIG = null;
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDBfDTdl4MwXJwAXtGL3KBQVSK1D69I0V4",
+  authDomain: "travel-f1b1a.firebaseapp.com",
+  projectId: "travel-f1b1a",
+  storageBucket: "travel-f1b1a.firebasestorage.app",
+  messagingSenderId: "610664829956",
+  appId: "1:610664829956:web:9805c17cc7a5e572cf5151"
+};
 const TRIP_ID = 'hokkaido-2026-bda97169cfdd';
 
 /* ===== ledger ===== */
