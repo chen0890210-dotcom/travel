@@ -233,6 +233,17 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .dr-trips li.soon{background:transparent;border-style:dashed;color:var(--muted)}
 .dr-trips strong{display:block;font-size:15px;font-weight:400}
 .dr-trips small{font-size:12px;color:var(--muted)}
+.dr-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.dr-list a{display:block;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:14px 16px;font-size:18px;letter-spacing:.1em}
+.dr-list a[aria-current="page"]{border:2px solid var(--ink);padding:13px 15px}
+.bar-top .nav{margin-left:auto}
+.bar-top .nav + .today{margin-left:0}
+.bar-top [hidden]{display:none}
+.isle{margin:6px 18px 0;background:var(--paper);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.isle svg{display:block;width:100%;height:auto}
+.soon-card{margin:12px 18px 0;padding:14px 16px;border:1px dashed var(--ink);border-radius:4px}
+.soon-card strong{font-size:16px}
+.soon-card p{margin:4px 0 0;font-size:14.5px;color:var(--muted)}
 /* folds */
 .fold{margin:20px 18px 0;background:var(--paper);border:1px solid var(--line);border-radius:4px}
 .fold summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:baseline;gap:10px;font-size:15.5px;letter-spacing:.1em}
@@ -259,7 +270,7 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 </head>
 <body>
 <header class="bar"><div class="wrap">
-  <div class="bar-top"><button class="burger" id="menuBtn" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button><a class="brand" href="#overview">冬雪北海道<small>QUEST MAP</small></a><button class="today" id="todayBtn" type="button">TODAY</button></div>
+  <div class="bar-top"><button class="burger" id="menuBtn" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button><a class="brand" id="brand" href="#overview"><span id="brandName">冬雪北海道</span><small>QUEST MAP</small></a><nav class="nav" id="topnav" aria-label="本次旅程"><a class="word" href="#overview"><b>地圖</b><small>MAP</small></a><a class="word" href="#cost"><b>錢錢</b><small>MONEY</small></a></nav><button class="today" id="todayBtn" type="button">TODAY</button></div>
 </div></header>
 <div class="scrim" id="scrim" hidden></div>
 <aside class="drawer" id="drawer" aria-label="選單" hidden></aside>
@@ -313,24 +324,35 @@ function state(d){ const t = today0().getTime(), x = dayDate(d).getTime(); retur
 function daysUntil(){ return Math.round((dayDate(DAYS[0]) - today0()) / 86400000); }
 
 const TRIPS = [
-  { id: 'hokkaido-2026', name: '冬雪北海道', sub: '札幌・富良野・小樽', start: '2026-11-24', end: '2026-12-03', who: '浣熊・蕭・君', current: true }
+  { id: 'hokkaido-2026', name: '冬雪北海道', href: '#overview', views: /^(overview|cost|day([1-9]|10))$/ },
+  { id: 'ishigaki', name: '石垣島', href: '#ishigaki', views: /^ishigaki$/ }
 ];
-function tripState(t){ const n = today0().getTime(), a = new Date(t.start + 'T00:00').getTime(), b = new Date(t.end + 'T00:00').getTime(); return n < a ? '即將出發' : n > b ? '已完成' : '旅行中'; }
 function renderNav(cur){
   const d = document.getElementById('drawer'); if (!d) return;
-  const ti = todayIndex();
-  const link = (href, main, sub, on) => '<a href="' + href + '"' + (on ? ' aria-current="page"' : '') + '><span>' + main + '</span>' + (sub ? '<small>' + sub + '</small>' : '') + '</a>';
-  let h = '<div class="dr-head"><span class="kicker">MENU</span><button class="dr-close" id="menuClose" type="button" aria-label="關閉選單">×</button></div>';
-  const t = TRIPS.find(x => x.current);
-  h += '<div class="dr-trip"><div class="kicker">NOW PLAYING</div><strong>' + t.name + '</strong><small>' + t.start.slice(5).replace('-','/') + ' – ' + t.end.slice(5).replace('-','/') + '・' + t.who + '</small></div>';
-  h += '<nav class="dr-sec" aria-label="本次旅程">' + link('#overview', '闖關地圖', 'MAP', cur === 'overview') + link('#cost', '錢錢・記帳分帳', 'MONEY', cur === 'cost') + '</nav>';
-  h += '<div class="dr-label">每日行程</div><nav class="dr-days" aria-label="每日行程">';
-  for (const x of DAYS) h += '<a href="#day' + x.n + '"' + (cur === 'day' + x.n ? ' aria-current="page"' : '') + (ti === x.n ? ' class="now"' : '') + '><b style="--c:' + C[x.n-1] + '">' + String(x.n).padStart(2,'0') + '</b><span>' + esc(SHORT[x.n-1]) + '<small>' + md(x) + '（' + WEEK[dayDate(x).getDay()] + '）</small></span></a>';
-  h += '</nav><div class="dr-label">我的旅程</div><ul class="dr-trips">';
-  for (const x of TRIPS) h += '<li' + (x.current ? ' class="on"' : '') + '><strong>' + x.name + '</strong><small>' + x.start.replace(/-/g,'/') + ' – ' + x.end.slice(5).replace('-','/') + '・' + tripState(x) + '</small></li>';
-  h += '<li class="soon"><strong>下一趟旅程</strong><small>之後規劃好的旅程會加在這裡</small></li></ul>';
-  d.innerHTML = h;
+  let h = '<div class="dr-head"><span class="kicker">MY TRIPS</span><button class="dr-close" id="menuClose" type="button" aria-label="關閉選單">×</button></div><nav class="dr-list" aria-label="我的旅程">';
+  for (const t of TRIPS) h += '<a href="' + t.href + '"' + (t.views.test(cur) ? ' aria-current="page"' : '') + '>' + t.name + '</a>';
+  d.innerHTML = h + '</nav>';
   document.getElementById('menuClose').addEventListener('click', closeMenu);
+  const isH = TRIPS[0].views.test(cur);
+  document.getElementById('brandName').textContent = isH ? '冬雪北海道' : '石垣島';
+  document.getElementById('brand').setAttribute('href', isH ? '#overview' : '#ishigaki');
+  const tn = document.getElementById('topnav'); tn.hidden = !isH;
+  document.getElementById('todayBtn').hidden = !isH;
+  tn.querySelectorAll('a').forEach(x => { if (x.getAttribute('href') === '#' + (cur === 'cost' ? 'cost' : cur === 'overview' ? 'overview' : '')) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current'); });
+}
+function renderIshigaki(){
+  let h = '<section class="stagehead" style="--c:var(--blue)"><div class="kicker"><b>NEXT TRIP</b>　下一趟旅程</div><h1>石垣島</h1><div class="route">日期未定・行程規劃中</div></section>';
+  h += '<div class="isle"><svg viewBox="0 0 320 170" role="img" aria-label="石垣島插圖">' +
+    '<circle cx="250" cy="44" r="20" fill="color-mix(in srgb,var(--mustard) 70%,var(--paper))" stroke="var(--ink)" stroke-width="1.4"/><circle cx="244" cy="42" r="1.4" fill="var(--ink)"/><circle cx="256" cy="42" r="1.4" fill="var(--ink)"/><path d="M246 48 q4 3 8 0" stroke="var(--ink)" stroke-width="1.2" fill="none" stroke-linecap="round"/>' +
+    '<path d="M40 118 Q90 70 150 96 Q200 74 262 118 Z" fill="color-mix(in srgb,var(--sage) 55%,var(--paper))" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<path d="M104 96 q2 -22 -4 -36" stroke="#A07A5A" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M100 60 q-16 -4 -24 6 M100 60 q-6 -14 -20 -14 M100 60 q12 -10 24 -4 M100 60 q16 2 20 14" stroke="var(--sage)" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+    '<path d="M0 124 q20 -10 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 V170 H0 Z" fill="color-mix(in srgb,var(--blue) 35%,var(--paper))"/>' +
+    '<path d="M20 146 q10 -6 20 0 q10 -6 20 0 M150 152 q10 -6 20 0 q10 -6 20 0 M250 142 q10 -6 20 0" stroke="var(--paper)" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+    '<g transform="translate(206 140)"><ellipse cx="0" cy="0" rx="14" ry="9" fill="var(--sage)" stroke="var(--ink)" stroke-width="1.3"/><circle cx="16" cy="-2" r="5" fill="var(--sage)" stroke="var(--ink)" stroke-width="1.3"/><circle cx="17.5" cy="-3" r="1" fill="var(--ink)"/><path d="M-6 -4 l6 -3 6 3 -6 3z" fill="none" stroke="var(--ink)" stroke-width="1"/></g>' +
+    '</svg></div>';
+  h += '<div class="soon-card"><strong>闖關地圖建置中</strong><p>決定好日期、住宿和想去的地方後告訴我，我就幫這趟做出專屬的闖關地圖、每日行程和記帳本。</p></div>';
+  h += '<div class="pager"><a href="#overview">← 冬雪北海道</a></div><div class="spacer"></div>';
+  return h;
 }
 function openMenu(){
   const d = document.getElementById('drawer'), s = document.getElementById('scrim');
@@ -773,10 +795,10 @@ async function connectDb(){
 
 function show(){
   let id = (location.hash || '').slice(1);
-  if (!/^(overview|cost|day([1-9]|10))$/.test(id)) id = 'overview';
+  if (!/^(overview|cost|ishigaki|day([1-9]|10))$/.test(id)) id = 'overview';
   const view = document.getElementById('view');
   view.classList.remove('view'); void view.offsetWidth; view.classList.add('view');
-  view.innerHTML = id === 'overview' ? renderOverview() : id === 'cost' ? renderCost() : renderDay(DAYS[Number(id.slice(3)) - 1]);
+  view.innerHTML = id === 'overview' ? renderOverview() : id === 'cost' ? renderCost() : id === 'ishigaki' ? renderIshigaki() : renderDay(DAYS[Number(id.slice(3)) - 1]);
   renderNav(id); window.scrollTo(0, 0);
   ANIM++;
   if (id === 'cost') renderLedger();
