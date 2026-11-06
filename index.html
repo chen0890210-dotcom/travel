@@ -6,7 +6,11 @@
 <meta name="theme-color" content="#ECE7DD">
 <meta name="color-scheme" content="light only">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="冬雪北海道">
+<meta name="apple-mobile-web-app-title" content="旅遊">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <title>冬雪北海道</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=LXGW+WenKai+TC:wght@400;700&display=swap">
 <style>
@@ -244,6 +248,17 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .soon-card{margin:12px 18px 0;padding:14px 16px;border:1px dashed var(--ink);border-radius:4px}
 .soon-card strong{font-size:16px}
 .soon-card p{margin:4px 0 0;font-size:14.5px;color:var(--muted)}
+.who-tbl .r{grid-template-columns:minmax(0,1fr) auto auto auto}
+.editbar{display:flex;justify-content:space-between;align-items:center;gap:8px;background:color-mix(in srgb,var(--mustard) 22%,transparent);border-radius:4px;padding:6px 10px;font-size:14px}
+.editbar[hidden]{display:none}
+.editbar button{border:1px solid var(--ink);background:var(--paper);border-radius:999px;padding:2px 12px;font:inherit;font-size:13px;cursor:pointer;min-height:30px}
+.addform.editing{border:2px solid var(--mustard)}
+.addform label small{color:var(--muted);margin-left:4px;font-size:11.5px}
+.ledger .nm{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;color:inherit;min-width:0}
+.ledger .e.on{border-color:var(--mustard);box-shadow:inset 3px 0 0 var(--mustard)}
+.ledger .nm em{font-style:normal;color:var(--mustard)}
+.pend{margin-top:6px;font-size:12.5px;color:var(--mustard)}
+.h2note{font-size:12px;color:var(--muted);letter-spacing:0;font-weight:400}
 /* folds */
 .fold{margin:20px 18px 0;background:var(--paper);border:1px solid var(--line);border-radius:4px}
 .fold summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:baseline;gap:10px;font-size:15.5px;letter-spacing:.1em}
@@ -618,7 +633,8 @@ const TRIP_ID = 'hokkaido-2026-bda97169cfdd';
 const CATS = [['餐飲','var(--rose)'],['交通','var(--blue)'],['滑雪','var(--sage)'],['購物','var(--mustard)'],['門票','var(--plum)'],['其他','var(--muted)']];
 const CATC = Object.fromEntries(CATS);
 const WHO = [['浣熊','var(--plum)'],['蕭','var(--blue)'],['君','var(--rose)']];
-const L = { list: [], rate: 0.215, mode: 'local', canWrite: true, db: null, cur: 'JPY', cat: '餐飲', who: '' };
+const PEOPLE = WHO.map(w => w[0]);
+const L = { list: [], rate: 0.215, mode: 'local', canWrite: true, db: null, cur: 'JPY', cat: '餐飲', who: '', split: PEOPLE.slice(), editing: null };
 try { const r = Number(localStorage.getItem('hk-rate')); if (r > 0) L.rate = r; } catch (e) {}
 function loadLocal(){ try { L.list = JSON.parse(localStorage.getItem('hk-ledger') || '[]') || []; } catch (e) { L.list = []; } }
 function saveLocal(){ try { localStorage.setItem('hk-ledger', JSON.stringify(L.list)); } catch (e) {} }
@@ -626,38 +642,34 @@ loadLocal();
 function fmt(n){ return Math.round(n).toLocaleString('en-US'); }
 function toTWD(e){ return e.cur === 'TWD' ? e.amount : e.amount * L.rate; }
 function defaultDay(){ const ti = todayIndex(); return ti ? String(ti) : '0'; }
+function splitOf(e){ const s = Array.isArray(e.split) ? e.split.filter(p => PEOPLE.includes(p)) : []; return s.length ? s : PEOPLE.slice(); }
+function chips(kind, list, isOn){ return list.map(([n,c]) => '<button type="button" data-' + kind + '="' + n + '" style="--c:' + c + '" aria-pressed="' + isOn(n) + '">' + n + '</button>').join(''); }
 
 function renderLedgerShell(){
-  let h = '';
-  h += '<div id="spent"></div>';
+  let h = '<div id="spent"></div>';
   if (L.canWrite) {
-    h += '<form class="addform" id="addform" autocomplete="off" novalidate>';
+    h += '<form class="addform' + (L.editing ? ' editing' : '') + '" id="addform" autocomplete="off" novalidate>';
+    h += '<div class="editbar" id="editbar"' + (L.editing ? '' : ' hidden') + '><span>正在修改這一筆</span><button type="button" id="cancelEdit">取消修改</button></div>';
     h += '<div><label for="f-amt">金額</label><div class="f-amt"><input id="f-amt" inputmode="decimal" placeholder="0" aria-label="金額"><div class="seg" role="group" aria-label="幣別"><button type="button" data-cur="JPY" aria-pressed="' + (L.cur==='JPY') + '">円</button><button type="button" data-cur="TWD" aria-pressed="' + (L.cur==='TWD') + '">NT$</button></div></div></div>';
-    h += '<div><label>類別</label><div class="chips" role="group" aria-label="類別">' + CATS.map(([n,c]) => '<button type="button" data-cat="' + n + '" style="--c:' + c + '" aria-pressed="' + (L.cat===n) + '">' + n + '</button>').join('') + '</div></div>';
+    h += '<div><label>類別</label><div class="chips" role="group" aria-label="類別">' + chips('cat', CATS, n => L.cat === n) + '</div></div>';
     h += '<div><label for="f-item">項目</label><input id="f-item" placeholder="例如：雪風味噌拉麵" maxlength="40"></div>';
-    h += '<div><div><label for="f-day">哪一天</label><select id="f-day">' + DAYS.map(d => '<option value="' + d.n + '"' + (defaultDay()===String(d.n)?' selected':'') + '>Day ' + d.n + '・' + md(d) + '</option>').join('') + '<option value="0"' + (defaultDay()==='0'?' selected':'') + '>行前／其他</option></select></div>';
-    h += '</div><div><label>誰先付的</label><div class="chips" role="group" aria-label="誰先付的">' + WHO.map(([n,c]) => '<button type="button" data-who="' + n + '" style="--c:' + c + '" aria-pressed="' + (L.who===n) + '">' + n + '</button>').join('') + '</div></div>';
-    h += '<button class="addbtn" id="addbtn" type="submit">記一筆</button><div class="msg" id="msg" role="status"></div></form>';
+    h += '<div><label for="f-day">哪一天</label><select id="f-day">' + DAYS.map(d => '<option value="' + d.n + '"' + (defaultDay()===String(d.n)?' selected':'') + '>Day ' + d.n + '・' + md(d) + '</option>').join('') + '<option value="0"' + (defaultDay()==='0'?' selected':'') + '>行前／其他</option></select></div>';
+    h += '<div><label>誰先付的</label><div class="chips" role="group" aria-label="誰先付的">' + chips('who', WHO, n => L.who === n) + '</div></div>';
+    h += '<div><label>誰要分攤<small>（可多選）</small></label><div class="chips" id="splitchips" role="group" aria-label="誰要分攤">' + chips('split', WHO, n => L.split.includes(n)) + '</div></div>';
+    h += '<button class="addbtn" id="addbtn" type="submit">' + (L.editing ? '儲存修改' : '記一筆') + '</button><div class="msg" id="msg" role="status"></div></form>';
   }
   h += '<div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><span>（只影響換算顯示）</span></div>';
   h += '<h2>分帳結算</h2><div id="settle"></div>';
   h += '<h2>花費分類</h2><div id="bars"></div>';
-  h += '<h2>明細</h2><div id="ledger"></div>';
+  h += '<h2>明細<small class="h2note">點一筆可以修改</small></h2><div id="ledger"></div>';
   return h;
-}
-function syncText(){
-  if (L.mode === 'db') return L.canWrite ? '已連線：三個人打開這個網址都會看到同一本帳' : '已連線：你目前只能查看，無法新增或刪除';
-  if (L.mode === 'wait') return '連線中…';
-  return '目前只存在這支手機上';
 }
 function renderLedger(){
   const sp = document.getElementById('spent'); if (!sp) return;
-  const syncEl = document.getElementById('sync');
-  if (syncEl) { syncEl.className = 'sync' + (L.mode === 'db' ? ' live' : ''); syncEl.querySelector('span').textContent = syncText(); }
   const list = L.list;
-  let jpy = 0, twd = 0, all = 0;
-  for (const e of list) { if (e.cur === 'TWD') twd += e.amount; else jpy += e.amount; all += toTWD(e); }
-  sp.innerHTML = '<div class="spent"><div class="k">TOTAL SPENT</div><div class="big">NT$ ' + fmt(all) + '</div><div class="row"><span>日圓 <b>' + fmt(jpy) + ' 円</b></span><span>台幣 <b>NT$ ' + fmt(twd) + '</b></span><span>每人平均 <b>NT$ ' + fmt(all/3) + '</b></span><span>共 <b>' + list.length + '</b> 筆</span></div></div>';
+  let jpy = 0, twd = 0, all = 0, pend = 0;
+  for (const e of list) { if (e.cur === 'TWD') twd += e.amount; else jpy += e.amount; all += toTWD(e); if (e._pending) pend++; }
+  sp.innerHTML = '<div class="spent"><div class="k">TOTAL SPENT</div><div class="big">NT$ ' + fmt(all) + '</div><div class="row"><span>日圓 <b>' + fmt(jpy) + ' 円</b></span><span>台幣 <b>NT$ ' + fmt(twd) + '</b></span><span>每人平均 <b>NT$ ' + fmt(all/3) + '</b></span><span>共 <b>' + list.length + '</b> 筆</span></div>' + (pend ? '<div class="pend">有 ' + pend + ' 筆等網路恢復後自動上傳</div>' : '') + '</div>';
   const byCat = {}; for (const e of list) byCat[e.cat] = (byCat[e.cat] || 0) + toTWD(e);
   const max = Math.max(1, ...Object.values(byCat));
   document.getElementById('bars').innerHTML = list.length ? '<div class="bars">' + CATS.filter(([n]) => byCat[n]).map(([n,c]) => '<div class="r"><span>' + n + '</span><span class="t"><i style="width:' + (byCat[n]/max*100).toFixed(1) + '%;background:' + c + '"></i></span><b>NT$ ' + fmt(byCat[n]) + '</b></div>').join('') + '</div>' : '<div class="empty">還沒有記錄，記下第一筆吧</div>';
@@ -671,7 +683,9 @@ function renderLedger(){
     const d = DAYS[k-1];
     h += '<li><div class="dh"><span>' + (d ? 'DAY ' + k + '・' + md(d) : '行前／其他') + '</span><span>NT$ ' + fmt(sum) + '</span></div>';
     for (const e of g) {
-      h += '<div class="e"><span class="dot" style="background:' + (CATC[e.cat] || 'var(--muted)') + '"></span><span class="nm">' + esc(e.item || e.cat) + '<small>' + esc(e.cat) + (e.who ? '・' + esc(e.who) + ' 付' : '') + '</small></span>';
+      const sp2 = splitOf(e), partial = sp2.length < PEOPLE.length;
+      h += '<div class="e' + (L.editing === e.id ? ' on' : '') + '"><span class="dot" style="background:' + (CATC[e.cat] || 'var(--muted)') + '"></span>';
+      h += (L.canWrite ? '<button type="button" class="nm" data-edit="' + esc(e.id) + '" aria-label="修改 ' + esc(e.item || e.cat) + '">' : '<span class="nm">') + esc(e.item || e.cat) + '<small>' + esc(e.cat) + (e.who ? '・' + esc(e.who) + ' 付' : '') + (partial ? '・' + sp2.join('、') + ' 分' : '') + (e._pending ? '・<em>待上傳</em>' : '') + '</small>' + (L.canWrite ? '</button>' : '</span>');
       h += '<span class="am">' + (e.cur === 'TWD' ? 'NT$ ' + fmt(e.amount) : fmt(e.amount) + ' 円') + (e.cur === 'JPY' ? '<small>≈ NT$ ' + fmt(toTWD(e)) + '</small>' : '') + '</span>';
       h += L.canWrite ? '<button class="del" type="button" data-id="' + esc(e.id) + '" aria-label="刪除 ' + esc(e.item || e.cat) + '">×</button>' : '<span></span>';
       h += '</div>';
@@ -682,19 +696,23 @@ function renderLedger(){
 }
 function renderSettle(list){
   const box = document.getElementById('settle'); if (!box) return;
-  const people = WHO.map(w => w[0]), col = Object.fromEntries(WHO);
-  const paid = Object.fromEntries(people.map(p => [p, 0]));
+  const col = Object.fromEntries(WHO);
+  const paid = Object.fromEntries(PEOPLE.map(p => [p, 0])), owe = Object.fromEntries(PEOPLE.map(p => [p, 0]));
   let shared = 0, skipped = 0;
-  for (const e of list) { if (e.who in paid) { const v = toTWD(e); paid[e.who] += v; shared += v; } else skipped++; }
-  const each = shared / people.length;
-  let h = '<div class="who-tbl"><div class="r"><span>成員</span><span>先付</span><span>差額</span></div>';
-  for (const p of people) {
-    const d = paid[p] - each;
-    h += '<div class="r"><span class="p"><i style="background:' + col[p] + '"></i>' + p + '</span><span>NT$ ' + fmt(paid[p]) + '</span><b class="' + (d > 0.5 ? 'pos' : d < -0.5 ? 'neg' : '') + '">' + (d > 0.5 ? '+' : d < -0.5 ? '−' : '') + fmt(Math.abs(d)) + '</b></div>';
+  for (const e of list) {
+    if (!(e.who in paid)) { skipped++; continue; }
+    const v = toTWD(e), m = splitOf(e);
+    paid[e.who] += v; shared += v;
+    for (const p of m) owe[p] += v / m.length;
   }
-  h += '<div class="r"><span>每人應分擔</span><span></span><b>NT$ ' + fmt(each) + '</b></div></div>';
+  let h = '<div class="who-tbl"><div class="r"><span>成員</span><span>先付</span><span>應分擔</span><span>差額</span></div>';
+  for (const p of PEOPLE) {
+    const d = paid[p] - owe[p];
+    h += '<div class="r"><span class="p"><i style="background:' + col[p] + '"></i>' + p + '</span><span>' + fmt(paid[p]) + '</span><span>' + fmt(owe[p]) + '</span><b class="' + (d > 0.5 ? 'pos' : d < -0.5 ? 'neg' : '') + '">' + (d > 0.5 ? '+' : d < -0.5 ? '−' : '') + fmt(Math.abs(d)) + '</b></div>';
+  }
+  h += '<div class="r"><span>合計（NT$）</span><span>' + fmt(shared) + '</span><span>' + fmt(shared) + '</span><span></span></div></div>';
   const cred = [], debt = [];
-  for (const p of people) { const d = paid[p] - each; if (d > 0.5) cred.push([p, d]); else if (d < -0.5) debt.push([p, -d]); }
+  for (const p of PEOPLE) { const d = paid[p] - owe[p]; if (d > 0.5) cred.push([p, d]); else if (d < -0.5) debt.push([p, -d]); }
   cred.sort((a,b) => b[1]-a[1]); debt.sort((a,b) => b[1]-a[1]);
   const tr = []; let i = 0, j = 0;
   while (i < debt.length && j < cred.length) {
@@ -707,19 +725,48 @@ function renderSettle(list){
   if (skipped) h += '<p class="skip">有 ' + skipped + ' 筆沒有選付款人，未列入分帳。</p>';
   box.innerHTML = h;
 }
+function writeFailed(){ const m = document.getElementById('msg'); if (m) { m.style.color = ''; m.textContent = '有一筆沒能存到雲端，請檢查網路後再試一次'; } }
 async function addEntry(e){
-  if (L.mode === 'db' && L.backend) { await L.backend.add(e); return; }
+  if (L.mode === 'db' && L.backend) return L.backend.add(e);
   e.id = 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   L.list.push(e); saveLocal(); renderLedger();
 }
+async function updateEntry(id, e){
+  if (L.mode === 'db' && L.backend) return L.backend.set(id, e);
+  e.id = id; L.list = L.list.map(x => x.id === id ? e : x); saveLocal(); renderLedger();
+}
 async function delEntry(id){
-  if (L.mode === 'db' && L.backend) { await L.backend.del(id); return; }
+  if (L.mode === 'db' && L.backend) return L.backend.del(id);
   L.list = L.list.filter(x => x.id !== id); saveLocal(); renderLedger();
 }
+function setPressed(group, test){ document.querySelectorAll('[data-' + group + ']').forEach(b => b.setAttribute('aria-pressed', String(test(b.dataset[group])))); }
+function startEdit(id){
+  const e = L.list.find(x => x.id === id); if (!e) return;
+  L.editing = id; L.cur = e.cur === 'TWD' ? 'TWD' : 'JPY'; L.cat = CATC[e.cat] ? e.cat : '其他'; L.who = PEOPLE.includes(e.who) ? e.who : ''; L.split = splitOf(e);
+  document.getElementById('f-amt').value = e.amount; document.getElementById('f-item').value = e.item || '';
+  const ds = document.getElementById('f-day'); ds.value = String(e.day || 0);
+  setPressed('cur', v => v === L.cur); setPressed('cat', v => v === L.cat); setPressed('who', v => v === L.who); setPressed('split', v => L.split.includes(v));
+  document.getElementById('addform').classList.add('editing'); document.getElementById('editbar').hidden = false;
+  document.getElementById('addbtn').textContent = '儲存修改'; document.getElementById('msg').textContent = '';
+  document.querySelectorAll('.ledger .e').forEach(r => r.classList.toggle('on', !!r.querySelector('[data-edit="' + CSS.escape(id) + '"]')));
+  document.getElementById('addform').scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' });
+}
+function endEdit(){
+  L.editing = null;
+  const f = document.getElementById('addform'); if (!f) return;
+  f.classList.remove('editing'); document.getElementById('editbar').hidden = true;
+  document.getElementById('addbtn').textContent = '記一筆';
+  document.getElementById('f-amt').value = ''; document.getElementById('f-item').value = '';
+  document.querySelectorAll('.ledger .e.on').forEach(r => r.classList.remove('on'));
+  L.split = PEOPLE.slice(); setPressed('split', v => L.split.includes(v));
+}
 document.getElementById('view').addEventListener('click', ev => {
-  const cb = ev.target.closest('[data-cur]'); if (cb) { L.cur = cb.dataset.cur; cb.parentNode.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === cb))); return; }
-  const wb = ev.target.closest('[data-who]'); if (wb) { L.who = wb.dataset.who; wb.parentNode.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.who === L.who))); return; }
-  const kb = ev.target.closest('[data-cat]'); if (kb) { L.cat = kb.dataset.cat; kb.parentNode.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === kb))); return; }
+  const cb = ev.target.closest('[data-cur]'); if (cb) { L.cur = cb.dataset.cur; setPressed('cur', v => v === L.cur); return; }
+  const wb = ev.target.closest('[data-who]'); if (wb) { L.who = wb.dataset.who; setPressed('who', v => v === L.who); return; }
+  const sb = ev.target.closest('[data-split]'); if (sb) { const n = sb.dataset.split; L.split = L.split.includes(n) ? L.split.filter(x => x !== n) : PEOPLE.filter(p => p === n || L.split.includes(p)); setPressed('split', v => L.split.includes(v)); return; }
+  const kb = ev.target.closest('[data-cat]'); if (kb) { L.cat = kb.dataset.cat; setPressed('cat', v => v === L.cat); return; }
+  if (ev.target.closest('#cancelEdit')) { endEdit(); return; }
+  const eb = ev.target.closest('[data-edit]'); if (eb) { startEdit(eb.dataset.edit); return; }
   const db = ev.target.closest('.del'); if (db) {
     if (!db.classList.contains('armed')) {
       document.querySelectorAll('.del.armed').forEach(b => { b.classList.remove('armed'); b.textContent = '×'; });
@@ -728,25 +775,28 @@ document.getElementById('view').addEventListener('click', ev => {
       return;
     }
     clearTimeout(db._t); db.disabled = true; db.textContent = '刪除中';
-    delEntry(db.dataset.id).catch(() => { db.disabled = false; db.classList.remove('armed'); db.textContent = '×'; const m = document.getElementById('msg'); if (m) m.textContent = '刪除失敗，請稍後再試'; });
+    if (L.editing === db.dataset.id) endEdit();
+    Promise.resolve(delEntry(db.dataset.id)).catch(() => { db.disabled = false; db.classList.remove('armed'); db.textContent = '×'; writeFailed(); });
   }
 });
 document.getElementById('view').addEventListener('submit', async ev => {
   if (ev.target.id !== 'addform') return;
   ev.preventDefault();
   const msg = document.getElementById('msg'), btn = document.getElementById('addbtn');
+  msg.style.color = '';
   const amt = Number(String(document.getElementById('f-amt').value).replace(/[,，\s]/g, ''));
-  if (!(amt > 0)) { msg.textContent = '請輸入金額'; document.getElementById('f-amt').focus(); return; }
+  if (!(amt > 0 && amt < 10000000)) { msg.textContent = '請輸入金額'; document.getElementById('f-amt').focus(); return; }
   if (!L.who) { msg.textContent = '請選誰先付的'; return; }
-  const e = { amount: amt, cur: L.cur, cat: L.cat, item: document.getElementById('f-item').value.trim(), day: Number(document.getElementById('f-day').value), who: L.who, ts: Date.now() };
-  btn.disabled = true; msg.textContent = '';
+  if (!L.split.length) { msg.textContent = '請至少選一位分攤的人'; return; }
+  const old = L.editing ? L.list.find(x => x.id === L.editing) : null;
+  const e = { amount: amt, cur: L.cur, cat: L.cat, item: document.getElementById('f-item').value.trim(), day: Number(document.getElementById('f-day').value), who: L.who, split: L.split.slice(), ts: old ? (old.ts || Date.now()) : Date.now() };
+  btn.disabled = true;
   try {
-    await addEntry(e);
-    document.getElementById('f-amt').value = ''; document.getElementById('f-item').value = '';
-    msg.style.color = 'var(--sage)'; msg.textContent = '已記下'; setTimeout(() => { if (msg.textContent === '已記下') { msg.textContent = ''; msg.style.color = ''; } }, 1600);
-  } catch (err) {
-    msg.style.color = ''; msg.textContent = '儲存失敗，請稍後再試';
-  } finally { btn.disabled = false; }
+    const editing = L.editing;
+    if (editing) { await updateEntry(editing, e); endEdit(); } else { await addEntry(e); document.getElementById('f-amt').value = ''; document.getElementById('f-item').value = ''; }
+    msg.style.color = 'var(--sage)'; msg.textContent = editing ? '已修改' : '已記下';
+    setTimeout(() => { if (/^已(記下|修改)$/.test(msg.textContent)) { msg.textContent = ''; msg.style.color = ''; } }, 1600);
+  } catch (err) { writeFailed(); } finally { btn.disabled = false; }
 });
 document.getElementById('view').addEventListener('change', ev => {
   if (ev.target.id !== 'f-rate') return;
@@ -757,23 +807,29 @@ document.getElementById('view').addEventListener('change', ev => {
 async function connectFirebase(){
   if (!FIREBASE_CONFIG) return;
   L.mode = 'wait'; renderLedger();
-  const timer = setTimeout(() => { if (L.mode === 'wait') { L.mode = 'local'; loadLocal(); renderLedger(); } }, 10000);
+  const timer = setTimeout(() => { if (L.mode === 'wait') { L.mode = 'local'; loadLocal(); renderLedger(); } }, 15000);
   try {
     const app = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    const db = fs.getFirestore(app.initializeApp(FIREBASE_CONFIG));
+    const fbApp = app.initializeApp(FIREBASE_CONFIG);
+    let db;
+    try { db = fs.initializeFirestore(fbApp, { localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }) }); }
+    catch (e) { db = fs.getFirestore(fbApp); }
     const col = fs.collection(db, 'trips', TRIP_ID, 'expenses');
+    const clean = e => { const o = Object.assign({}, e); delete o._pending; return o; };
     L.backend = {
-      add: async e => { const ref = fs.doc(col); e.id = ref.id; await fs.setDoc(ref, e); },
-      del: id => fs.deleteDoc(fs.doc(col, id))
+      add: e => { const ref = fs.doc(col); e.id = ref.id; fs.setDoc(ref, clean(e)).catch(writeFailed); },
+      set: (id, e) => { e.id = id; fs.setDoc(fs.doc(col, id), clean(e)).catch(writeFailed); },
+      del: id => { fs.deleteDoc(fs.doc(col, id)).catch(writeFailed); }
     };
-    fs.onSnapshot(col, snap => {
+    fs.onSnapshot(col, { includeMetadataChanges: true }, snap => {
       clearTimeout(timer); L.mode = 'db';
-      L.list = snap.docs.map(d => Object.assign({}, d.data(), { id: d.id })).filter(e => typeof e.amount === 'number' && e.amount > 0);
+      L.list = snap.docs.map(d => Object.assign({}, d.data(), { id: d.id, _pending: d.metadata.hasPendingWrites })).filter(e => typeof e.amount === 'number' && e.amount > 0);
       renderLedger();
     }, () => { clearTimeout(timer); L.mode = 'local'; L.backend = null; loadLocal(); renderLedger(); });
   } catch (e) { clearTimeout(timer); L.mode = 'local'; L.backend = null; renderLedger(); }
 }
+
 async function connectDb(){
   if (!window.claude || typeof window.claude.use !== 'function') return connectFirebase();
   L.mode = 'wait'; renderLedger();
@@ -783,7 +839,7 @@ async function connectDb(){
   if (!db) { clearTimeout(timer); L.mode = 'local'; renderLedger(); return connectFirebase(); }
   try { const user = await window.claude.use('user'); const w = user ? await user.can('data.write') : null; if (w === false) L.canWrite = false; } catch (e) {}
   L.db = db;
-  L.backend = { add: async e => { const ref = db.collection('expenses').doc(); e.id = ref.id; await ref.set(e); }, del: id => db.collection('expenses').doc(id).delete() };
+  L.backend = { add: async e => { const ref = db.collection('expenses').doc(); e.id = ref.id; const o = Object.assign({}, e); delete o._pending; await ref.set(o); }, set: async (id, e) => { e.id = id; const o = Object.assign({}, e); delete o._pending; await db.collection('expenses').doc(id).set(o); }, del: id => db.collection('expenses').doc(id).delete() };
   db.collection('expenses').onSnapshot(snap => {
     clearTimeout(timer);
     L.mode = 'db';
@@ -795,6 +851,7 @@ async function connectDb(){
 }
 
 function show(){
+  L.editing = null;
   let id = (location.hash || '').slice(1);
   if (!/^(overview|cost|ishigaki|day([1-9]|10))$/.test(id)) id = 'overview';
   const view = document.getElementById('view');
@@ -819,6 +876,7 @@ document.getElementById('todayBtn').addEventListener('click', () => {
 window.addEventListener('hashchange', show);
 show();
 connectDb();
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
 </html>
