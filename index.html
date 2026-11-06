@@ -279,10 +279,10 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .ratebtn{border:1px solid var(--ink);background:var(--paper);border-radius:999px;padding:3px 12px;font:inherit;font-size:13px;cursor:pointer;min-height:32px}
 .ratenote{width:100%;font-size:12px;color:var(--muted)}
 .h2note{font-size:12px;color:var(--muted);letter-spacing:0;font-weight:400}
-.dr-list a{position:relative;overflow:hidden;min-height:84px;display:flex;align-items:center}
-.dr-list a span{position:relative;z-index:1;white-space:nowrap;background:var(--paper);padding-right:6px}
-.dr-art{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;align-items:flex-end;gap:2px}
-.dr-art img{width:34px;height:34px;object-fit:contain}
+.dr-list a{display:flex;align-items:center}
+.dr-list a .tn{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dr-art{margin-left:auto;flex:none;display:flex;align-items:center;gap:4px}
+.dr-art img{width:28px;height:28px;object-fit:contain}
 .dr-art-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .dr-art-pick .dice{font-size:26px;line-height:32px;height:32px}
 .dr-art-pick button.now{border-style:dashed;border-color:var(--ink)}
@@ -290,8 +290,9 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .dr-art-pick button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px 6px;border:1px solid var(--line);border-radius:8px;background:var(--paper);cursor:pointer;font:inherit;font-size:12px;color:var(--ink)}
 .dr-art-pick img{width:32px;height:32px;object-fit:contain}
 .dr-art-pick button[aria-pressed="true"]{border:2px solid var(--ink);padding:7px 1px 5px}
-.dr-art img:nth-child(2){width:42px;height:42px}
-.dr-list a{padding-right:16px}
+.dr-art img:nth-child(2){width:34px;height:34px}
+.dr-list a{gap:10px;min-height:62px;padding:12px 14px}
+.dr-list a[aria-current="page"]{padding:11px 13px}
 body[data-trip="ishigaki"]{--bg:#E6ECE8;background-color:var(--bg)}
 .mfold .rate{margin:0 14px 10px}
 .mfold .stl{width:calc(100% - 20px);margin:0 10px}
@@ -478,7 +479,7 @@ const TRIPS = [
 function renderNav(cur){
   const d = document.getElementById('drawer'); if (!d) return;
   let h = '<div class="dr-head"><span class="kicker">MY TRIPS</span><button class="dr-close" id="menuClose" type="button" aria-label="關閉選單">×</button></div><nav class="dr-list" aria-label="我的旅程">';
-  for (const t of TRIPS) h += '<a href="' + t.href + '"' + (t.views.test(cur) ? ' aria-current="page"' : '') + '><span>' + t.name + '</span>' + (MENU_ART[t.id] ? MENU_ART[t.id]() : '') + '</a>';
+  for (const t of TRIPS) h += '<a href="' + t.href + '"' + (t.views.test(cur) ? ' aria-current="page"' : '') + '><span class="tn">' + t.name + '</span>' + (MENU_ART[t.id] ? MENU_ART[t.id]() : '') + '</a>';
   h += '</nav><div class="dr-label">插畫風格</div><div class="dr-art-pick" role="group" aria-label="插畫風格"><button type="button" data-art="random" aria-pressed="' + (ARTPREF === 'random') + '"><span class="dice" aria-hidden="true">🎲</span><span>隨機</span></button>' + Object.entries(ART).map(([id, a]) => '<button type="button" data-art="' + id + '" aria-pressed="' + (ARTPREF === id) + '"' + (ARTPREF === 'random' && id === ARTSTYLE ? ' class="now"' : '') + '><img src="' + a.url('snowman', false) + '" alt=""><span>' + a.name + '</span></button>').join('') + '</div><p class="dr-note">' + (ARTPREF === 'random' ? '每次打開隨機換一種，這次是「' + ART[ARTSTYLE].name + '」' : '固定使用「' + ART[ARTSTYLE].name + '」') + '</p>';
   d.innerHTML = h;
   document.getElementById('menuClose').addEventListener('click', closeMenu);
@@ -816,7 +817,7 @@ function renderLedgerShell(){
   }
   h += '<details class="fold mfold"><summary>分帳結算<small id="settlesum"></small></summary><div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><button type="button" class="ratebtn" id="rateBtn">自動帶入</button><span class="ratenote" id="ratenote">' + rateNote() + '</span></div><div id="settle"></div></details>';
   h += '<details class="fold mfold"><summary>花費分類</summary><div id="bars"></div></details>';
-  h += '<details class="fold mfold ledfold" open><summary>明細<small id="ledsum"></small></summary><p class="h2note in">點一筆可以修改</p><div id="spent"></div><div id="ledger"></div></details>';
+  h += '<details class="fold mfold ledfold"><summary>明細<small id="ledsum"></small></summary><p class="h2note in">點一筆可以修改</p><div id="spent"></div><div id="ledger"></div></details>';
   return h;
 }
 function renderLedger(){
