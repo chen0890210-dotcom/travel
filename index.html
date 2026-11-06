@@ -258,7 +258,26 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .ledger .e.on{border-color:var(--mustard);box-shadow:inset 3px 0 0 var(--mustard)}
 .ledger .nm em{font-style:normal;color:var(--mustard)}
 .pend{margin-top:6px;font-size:12.5px;color:var(--mustard)}
-.spent .tw{font-family:var(--type);font-size:15px;color:var(--muted);margin-top:2px}
+.spent .cols{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:6px}
+.spent .cols div{display:flex;flex-direction:column}
+.spent .cols small{font-size:12px;color:var(--muted)}
+.spent .cols b{font-family:var(--type);font-size:19px;font-weight:700;line-height:1.3}
+.spent .cols .sum{grid-column:1/-1;border-top:1px dashed var(--line);padding-top:6px}
+.spent .cols .sum b{font-size:28px}
+.stl{width:calc(100% - 36px);margin:0 18px;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:4px;table-layout:fixed;font-size:12.5px}
+.stl th,.stl td{padding:9px 8px;text-align:right;white-space:nowrap;border-top:1px dashed var(--line);font-family:var(--type)}
+.stl th{font-family:var(--text);font-weight:400;font-size:12px;color:var(--muted);border-top:0}
+.stl th:first-child,.stl td:first-child{text-align:left;font-family:var(--text);width:24%}
+.stl td.tot,.stl th:last-child{width:30%}
+.stl td b{font-weight:700}
+.stl tfoot td{border-top:1px solid var(--ink);font-size:12.5px;color:var(--muted)}
+.stl tfoot td:first-child{font-size:12.5px}
+.stl .p{display:inline-flex;align-items:center;gap:6px}
+.stl .p i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.stlnote{margin:6px 20px 0;font-size:12px;color:var(--muted)}
+.rate{margin:0 20px 10px}
+.ratebtn{border:1px solid var(--ink);background:var(--paper);border-radius:999px;padding:3px 12px;font:inherit;font-size:13px;cursor:pointer;min-height:32px}
+.ratenote{width:100%;font-size:12px;color:var(--muted)}
 .h2note{font-size:12px;color:var(--muted);letter-spacing:0;font-weight:400}
 /* folds */
 .fold{margin:20px 18px 0;background:var(--paper);border:1px solid var(--line);border-radius:4px}
@@ -635,13 +654,28 @@ const CATS = [['餐飲','var(--rose)'],['交通','var(--blue)'],['滑雪','var(-
 const CATC = Object.fromEntries(CATS);
 const WHO = [['浣熊','var(--plum)'],['蕭','var(--blue)'],['君','var(--rose)']];
 const PEOPLE = WHO.map(w => w[0]);
-const L = { list: [], rate: 0.205, mode: 'local', canWrite: true, db: null, cur: 'JPY', cat: '餐飲', who: '', split: PEOPLE.slice(), editing: null };
+const L = { list: [], rate: 0.205, rateTs: 0, rateSrc: '預設', mode: 'local', canWrite: true, db: null, cur: 'JPY', cat: '餐飲', who: '', split: PEOPLE.slice(), editing: null };
 function loadLocal(){ try { L.list = JSON.parse(localStorage.getItem('hk-ledger') || '[]') || []; } catch (e) { L.list = []; } }
 function saveLocal(){ try { localStorage.setItem('hk-ledger', JSON.stringify(L.list)); } catch (e) {} }
 loadLocal();
 function fmt(n){ return Math.round(n).toLocaleString('en-US'); }
 function toTWD(e){ return e.cur === 'TWD' ? e.amount : e.amount * L.rate; }
 function toJPY(e){ return e.cur === 'TWD' ? e.amount / L.rate : e.amount; }
+try { const r = JSON.parse(localStorage.getItem('hk-rate2') || 'null'); if (r && r.rate > 0 && r.rate < 5) { L.rate = r.rate; L.rateTs = r.ts || 0; L.rateSrc = r.src || ''; } } catch (e) {}
+function saveRate(){ try { localStorage.setItem('hk-rate2', JSON.stringify({ rate: L.rate, ts: L.rateTs, src: L.rateSrc })); } catch (e) {} }
+function rateNote(){ if (!L.rateTs) return '尚未自動更新，先用預設值'; const d = new Date(L.rateTs); return L.rateSrc + '・' + (d.getMonth()+1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+async function fetchRate(manual){
+  const note = document.getElementById('ratenote'); if (note && manual) note.textContent = '更新中…';
+  const tries = [
+    ['https://open.er-api.com/v6/latest/JPY', j => j && j.rates && j.rates.TWD],
+    ['https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/jpy.json', j => j && j.jpy && j.jpy.twd]
+  ];
+  for (const [u, pick] of tries) {
+    try { const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) continue; const v = Number(pick(await r.json())); if (v > 0 && v < 5) { L.rate = Math.round(v * 10000) / 10000; L.rateTs = Date.now(); L.rateSrc = '自動'; saveRate(); const inp = document.getElementById('f-rate'); if (inp) inp.value = L.rate; renderLedger(); return true; } } catch (e) {}
+  }
+  if (note) note.textContent = '無法取得最新匯率，維持 ' + L.rate + '（' + rateNote() + '）';
+  return false;
+}
 function defaultDay(){ const ti = todayIndex(); return ti ? String(ti) : '0'; }
 function splitOf(e){ const s = Array.isArray(e.split) ? e.split.filter(p => PEOPLE.includes(p)) : []; return s.length ? s : PEOPLE.slice(); }
 function chips(kind, list, isOn){ return list.map(([n,c]) => '<button type="button" data-' + kind + '="' + n + '" style="--c:' + c + '" aria-pressed="' + isOn(n) + '">' + n + '</button>').join(''); }
@@ -659,8 +693,7 @@ function renderLedgerShell(){
     h += '<div><label>誰要分攤<small>（可多選）</small></label><div class="chips" id="splitchips" role="group" aria-label="誰要分攤">' + chips('split', WHO, n => L.split.includes(n)) + '</div></div>';
     h += '<button class="addbtn" id="addbtn" type="submit">' + (L.editing ? '儲存修改' : '記一筆') + '</button><div class="msg" id="msg" role="status"></div></form>';
   }
-  h += '<div class="rate">匯率固定 1 円 ＝ NT$ ' + L.rate + '，三人統一換算</div>';
-  h += '<h2>分帳結算</h2><div id="settle"></div>';
+  h += '<h2>分帳結算</h2><div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><button type="button" class="ratebtn" id="rateBtn">自動帶入</button><span class="ratenote" id="ratenote">' + rateNote() + '</span></div><div id="settle"></div>';
   h += '<h2>花費分類</h2><div id="bars"></div>';
   h += '<h2>明細<small class="h2note">點一筆可以修改</small></h2><div id="ledger"></div>';
   return h;
@@ -669,25 +702,26 @@ function renderLedger(){
   const sp = document.getElementById('spent'); if (!sp) return;
   const list = L.list;
   let jpy = 0, twd = 0, all = 0, pend = 0;
-  for (const e of list) { if (e.cur === 'TWD') twd += e.amount; else jpy += e.amount; all += toJPY(e); if (e._pending) pend++; }
-  sp.innerHTML = '<div class="spent"><div class="k">TOTAL SPENT</div><div class="big">' + fmt(all) + ' 円</div><div class="tw">換成台幣 ≈ NT$ ' + fmt(all * L.rate) + '</div><div class="row"><span>每人平均 <b>' + fmt(all/3) + ' 円</b></span><span>共 <b>' + list.length + '</b> 筆</span>' + (twd ? '<span>含台幣支出 <b>NT$ ' + fmt(twd) + '</b></span>' : '') + '</div>' + (pend ? '<div class="pend">有 ' + pend + ' 筆等網路恢復後自動上傳</div>' : '') + '</div>';
-  const byCat = {}; for (const e of list) byCat[e.cat] = (byCat[e.cat] || 0) + toJPY(e);
+  for (const e of list) { if (e.cur === 'TWD') twd += e.amount; else jpy += e.amount; if (e._pending) pend++; }
+  all = jpy * L.rate + twd;
+  sp.innerHTML = '<div class="spent"><div class="k">TOTAL SPENT</div><div class="cols"><div><small>日幣</small><b>' + fmt(jpy) + ' 円</b></div><div><small>台幣</small><b>NT$ ' + fmt(twd) + '</b></div><div class="sum"><small>總計（台幣）</small><b>NT$ ' + fmt(all) + '</b></div></div><div class="row"><span>每人平均 <b>NT$ ' + fmt(all/3) + '</b></span><span>共 <b>' + list.length + '</b> 筆</span><span>匯率 <b>' + L.rate + '</b></span></div>' + (pend ? '<div class="pend">有 ' + pend + ' 筆等網路恢復後自動上傳</div>' : '') + '</div>';
+  const byCat = {}; for (const e of list) byCat[e.cat] = (byCat[e.cat] || 0) + toTWD(e);
   const max = Math.max(1, ...Object.values(byCat));
-  document.getElementById('bars').innerHTML = list.length ? '<div class="bars">' + CATS.filter(([n]) => byCat[n]).map(([n,c]) => '<div class="r"><span>' + n + '</span><span class="t"><i style="width:' + (byCat[n]/max*100).toFixed(1) + '%;background:' + c + '"></i></span><b>' + fmt(byCat[n]) + ' 円</b></div>').join('') + '</div>' : '<div class="empty">還沒有記錄，記下第一筆吧</div>';
+  document.getElementById('bars').innerHTML = list.length ? '<div class="bars">' + CATS.filter(([n]) => byCat[n]).map(([n,c]) => '<div class="r"><span>' + n + '</span><span class="t"><i style="width:' + (byCat[n]/max*100).toFixed(1) + '%;background:' + c + '"></i></span><b>NT$ ' + fmt(byCat[n]) + '</b></div>').join('') + '</div>' : '<div class="empty">還沒有記錄，記下第一筆吧</div>';
   renderSettle(list);
   const groups = {}; for (const e of list) (groups[e.day] = groups[e.day] || []).push(e);
   const order = Object.keys(groups).map(Number).sort((a,b) => (b||99) - (a||99));
   let h = '';
   for (const k of order) {
     const g = groups[k].sort((a,b) => (b.ts||0) - (a.ts||0));
-    const sum = g.reduce((s,e) => s + toJPY(e), 0);
+    const sj = g.reduce((s,e) => s + (e.cur === 'TWD' ? 0 : e.amount), 0), st = g.reduce((s,e) => s + (e.cur === 'TWD' ? e.amount : 0), 0);
     const d = DAYS[k-1];
-    h += '<li><div class="dh"><span>' + (d ? 'DAY ' + k + '・' + md(d) : '行前／其他') + '</span><span>' + fmt(sum) + ' 円</span></div>';
+    h += '<li><div class="dh"><span>' + (d ? 'DAY ' + k + '・' + md(d) : '行前／其他') + '</span><span>' + [sj ? fmt(sj) + ' 円' : '', st ? 'NT$ ' + fmt(st) : ''].filter(Boolean).join('＋') + '</span></div>';
     for (const e of g) {
       const sp2 = splitOf(e), partial = sp2.length < PEOPLE.length;
       h += '<div class="e' + (L.editing === e.id ? ' on' : '') + '"><span class="dot" style="background:' + (CATC[e.cat] || 'var(--muted)') + '"></span>';
       h += (L.canWrite ? '<button type="button" class="nm" data-edit="' + esc(e.id) + '" aria-label="修改 ' + esc(e.item || e.cat) + '">' : '<span class="nm">') + esc(e.item || e.cat) + '<small>' + esc(e.cat) + (e.who ? '・' + esc(e.who) + ' 付' : '') + (partial ? '・' + sp2.join('、') + ' 分' : '') + (e._pending ? '・<em>待上傳</em>' : '') + '</small>' + (L.canWrite ? '</button>' : '</span>');
-      h += '<span class="am">' + (e.cur === 'TWD' ? 'NT$ ' + fmt(e.amount) + '<small>≈ ' + fmt(toJPY(e)) + ' 円</small>' : fmt(e.amount) + ' 円') + '</span>';
+      h += '<span class="am">' + (e.cur === 'TWD' ? 'NT$ ' + fmt(e.amount) : fmt(e.amount) + ' 円') + '</span>';
       h += L.canWrite ? '<button class="del" type="button" data-id="' + esc(e.id) + '" aria-label="刪除 ' + esc(e.item || e.cat) + '">×</button>' : '<span></span>';
       h += '</div>';
     }
@@ -698,31 +732,32 @@ function renderLedger(){
 function renderSettle(list){
   const box = document.getElementById('settle'); if (!box) return;
   const col = Object.fromEntries(WHO);
-  const paid = Object.fromEntries(PEOPLE.map(p => [p, 0])), owe = Object.fromEntries(PEOPLE.map(p => [p, 0]));
-  let shared = 0, skipped = 0;
+  const z = () => Object.fromEntries(PEOPLE.map(p => [p, 0]));
+  const paid = { JPY: z(), TWD: z() }, owe = { JPY: z(), TWD: z() }, tot = { JPY: 0, TWD: 0 };
+  let skipped = 0;
   for (const e of list) {
-    if (!(e.who in paid)) { skipped++; continue; }
-    const v = toJPY(e), m = splitOf(e);
-    paid[e.who] += v; shared += v;
-    for (const p of m) owe[p] += v / m.length;
+    if (!PEOPLE.includes(e.who)) { skipped++; continue; }
+    const c = e.cur === 'TWD' ? 'TWD' : 'JPY', m = splitOf(e);
+    paid[c][e.who] += e.amount; tot[c] += e.amount;
+    for (const p of m) owe[c][p] += e.amount / m.length;
   }
-  let h = '<div class="who-tbl"><div class="r"><span>成員（円）</span><span>先付</span><span>應分擔</span><span>差額</span></div>';
-  for (const p of PEOPLE) {
-    const d = paid[p] - owe[p];
-    h += '<div class="r"><span class="p"><i style="background:' + col[p] + '"></i>' + p + '</span><span>' + fmt(paid[p]) + '</span><span>' + fmt(owe[p]) + '</span><b class="' + (d > 0.5 ? 'pos' : d < -0.5 ? 'neg' : '') + '">' + (d > 0.5 ? '+' : d < -0.5 ? '−' : '') + fmt(Math.abs(d)) + '</b></div>';
-  }
-  h += '<div class="r"><span>合計</span><span>' + fmt(shared) + '</span><span>' + fmt(shared) + '</span><span></span></div></div>';
+  const diff = {}; for (const p of PEOPLE) { const j = paid.JPY[p] - owe.JPY[p], t = paid.TWD[p] - owe.TWD[p]; diff[p] = { j, t, all: j * L.rate + t }; }
+  const sg = (v, pre, suf) => '<b class="' + (v > 0.5 ? 'pos' : v < -0.5 ? 'neg' : '') + '">' + (v > 0.5 ? '+' : v < -0.5 ? '−' : '') + (pre || '') + fmt(Math.abs(v)) + (suf || '') + '</b>';
+  let h = '<table class="stl"><thead><tr><th>成員</th><th>日幣</th><th>台幣</th><th>總計</th></tr></thead><tbody>';
+  for (const p of PEOPLE) h += '<tr><td><span class="p"><i style="background:' + col[p] + '"></i>' + p + '</span></td><td>' + sg(diff[p].j, '', ' 円') + '</td><td>' + sg(diff[p].t, 'NT$ ') + '</td><td class="tot">' + sg(diff[p].all, 'NT$ ') + '</td></tr>';
+  h += '</tbody><tfoot><tr><td>支出合計</td><td>' + fmt(tot.JPY) + ' 円</td><td>NT$ ' + fmt(tot.TWD) + '</td><td class="tot">NT$ ' + fmt(tot.JPY * L.rate + tot.TWD) + '</td></tr></tfoot></table>';
+  h += '<p class="stlnote">正數代表應該拿回的錢，負數代表還要付出的錢；總計 ＝ 日幣 × ' + L.rate + ' ＋ 台幣。</p>';
   const cred = [], debt = [];
-  for (const p of PEOPLE) { const d = paid[p] - owe[p]; if (d > 0.5) cred.push([p, d]); else if (d < -0.5) debt.push([p, -d]); }
+  for (const p of PEOPLE) { const d = diff[p].all; if (d > 0.5) cred.push([p, d]); else if (d < -0.5) debt.push([p, -d]); }
   cred.sort((a,b) => b[1]-a[1]); debt.sort((a,b) => b[1]-a[1]);
   const tr = []; let i = 0, j = 0;
   while (i < debt.length && j < cred.length) {
     const x = Math.min(debt[i][1], cred[j][1]); tr.push([debt[i][0], cred[j][0], x]);
     debt[i][1] -= x; cred[j][1] -= x; if (debt[i][1] < 0.5) i++; if (cred[j][1] < 0.5) j++;
   }
-  if (!shared) h += '<div class="even">還沒有分帳資料，記帳時選「誰先付的」就會自動算</div>';
+  if (!(tot.JPY || tot.TWD)) h += '<div class="even">還沒有分帳資料，記帳時選「誰先付的」就會自動算</div>';
   else if (!tr.length) h += '<div class="even">目前大家打平，不用轉帳</div>';
-  else h += '<div class="xfer">' + tr.map(([a,b,x]) => '<div><span class="p">' + a + '</span><span class="arrow">付給 →</span><span class="p">' + b + '</span><span class="amt">NT$ ' + fmt(x * L.rate) + '<small>' + fmt(x) + ' 円 × ' + L.rate + '</small></span></div>').join('') + '</div>';
+  else h += '<div class="xfer">' + tr.map(([a,b,x]) => '<div><span class="p">' + a + '</span><span class="arrow">付給 →</span><span class="p">' + b + '</span><span class="amt">NT$ ' + fmt(x) + '<small>或 ' + fmt(x / L.rate) + ' 円</small></span></div>').join('') + '</div>';
   if (skipped) h += '<p class="skip">有 ' + skipped + ' 筆沒有選付款人，未列入分帳。</p>';
   box.innerHTML = h;
 }
@@ -767,6 +802,7 @@ document.getElementById('view').addEventListener('click', ev => {
   const sb = ev.target.closest('[data-split]'); if (sb) { const n = sb.dataset.split; L.split = L.split.includes(n) ? L.split.filter(x => x !== n) : PEOPLE.filter(p => p === n || L.split.includes(p)); setPressed('split', v => L.split.includes(v)); return; }
   const kb = ev.target.closest('[data-cat]'); if (kb) { L.cat = kb.dataset.cat; setPressed('cat', v => v === L.cat); return; }
   if (ev.target.closest('#cancelEdit')) { endEdit(); return; }
+  if (ev.target.closest('#rateBtn')) { fetchRate(true).then(ok => { const n = document.getElementById('ratenote'); if (ok && n) n.textContent = rateNote(); }); return; }
   const eb = ev.target.closest('[data-edit]'); if (eb) { startEdit(eb.dataset.edit); return; }
   const db = ev.target.closest('.del'); if (db) {
     if (!db.classList.contains('armed')) {
@@ -802,7 +838,8 @@ document.getElementById('view').addEventListener('submit', async ev => {
 document.getElementById('view').addEventListener('change', ev => {
   if (ev.target.id !== 'f-rate') return;
   const r = Number(ev.target.value); if (!(r > 0 && r < 5)) { ev.target.value = L.rate; return; }
-  L.rate = r; try { localStorage.setItem('hk-rate', String(r)); } catch (e) {}
+  L.rate = r; L.rateTs = Date.now(); L.rateSrc = '手動'; saveRate();
+  const n = document.getElementById('ratenote'); if (n) n.textContent = rateNote();
   renderLedger();
 });
 async function connectFirebase(){
@@ -860,7 +897,7 @@ function show(){
   view.innerHTML = id === 'overview' ? renderOverview() : id === 'cost' ? renderCost() : id === 'ishigaki' ? renderIshigaki() : renderDay(DAYS[Number(id.slice(3)) - 1]);
   renderNav(id); window.scrollTo(0, 0);
   ANIM++;
-  if (id === 'cost') renderLedger();
+  if (id === 'cost') { renderLedger(); if (L.rateSrc !== '手動' && (Date.now() - L.rateTs > 6 * 3600000 || L.rateSrc === '預設')) fetchRate(false).then(ok => { const n = document.getElementById('ratenote'); if (ok && n) n.textContent = rateNote(); }); }
   if (id === 'overview') { requestAnimationFrame(() => playToday()); const pb = el('playbtn'); if (pb) pb.addEventListener('click', playAll); }
 }
 document.getElementById('view').addEventListener('click', e => {
