@@ -199,6 +199,59 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .skip{margin:8px 20px 0;font-size:12.5px;color:var(--muted)}
 .rate{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 20px 0;font-size:13.5px;color:var(--muted)}
 .rate input{width:84px;font-family:var(--type);font-size:15px;border:1px solid var(--line);border-radius:4px;padding:4px 8px;background:var(--paper);color:var(--ink)}
+/* menu */
+.burger{width:40px;height:40px;margin-left:-8px;border:0;background:transparent;border-radius:4px;display:grid;place-content:center;gap:4px;cursor:pointer;flex:none}
+.burger span{display:block;width:20px;height:2px;border-radius:1px;background:var(--ink)}
+.burger:hover{background:var(--paper)}
+.bar-top .today{margin-left:auto}
+.scrim{position:fixed;inset:0;z-index:20;background:rgba(57,56,51,.32);opacity:0;transition:opacity .2s}
+.scrim.open{opacity:1}
+.drawer{position:fixed;top:0;bottom:0;left:0;z-index:21;width:min(86vw,330px);overflow-y:auto;background:var(--bg);background-image:radial-gradient(var(--dot) 1.1px,transparent 1.2px);background-size:18px 18px;border-right:1px solid var(--line);box-shadow:6px 0 24px rgba(57,56,51,.18);padding:calc(env(safe-area-inset-top,0px) + 10px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-102%);transition:transform .22s ease-out}
+.drawer.open{transform:none}
+@media (prefers-reduced-motion:reduce){ .drawer,.scrim{transition:none} }
+.dr-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.dr-close{width:40px;height:40px;border:0;background:transparent;font-size:26px;line-height:1;color:var(--muted);cursor:pointer;border-radius:4px}
+.dr-trip{background:var(--paper);border:2px solid var(--ink);border-radius:4px;padding:12px 14px}
+.dr-trip strong{display:block;font-size:20px;letter-spacing:.08em;margin-top:2px}
+.dr-trip small{font-size:12.5px;color:var(--muted)}
+.dr-sec{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.dr-sec a{display:flex;align-items:baseline;justify-content:space-between;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:10px 14px;font-size:16px}
+.dr-sec a small{font-family:var(--type);font-size:11px;letter-spacing:.14em;color:var(--muted)}
+.dr-sec a[aria-current="page"]{border-color:var(--ink);box-shadow:inset 3px 0 0 var(--ink)}
+.dr-label{font-size:13px;letter-spacing:.2em;color:var(--muted);margin:20px 2px 8px}
+.dr-days{display:flex;flex-direction:column}
+.dr-days a{display:grid;grid-template-columns:38px minmax(0,1fr);gap:10px;align-items:center;text-decoration:none;padding:7px 6px;border-radius:4px;border-top:1px dashed var(--line)}
+.dr-days a:first-child{border-top:0}
+.dr-days a b{font-family:var(--type);font-size:15px;font-weight:700;color:var(--c)}
+.dr-days a span{font-size:14.5px;line-height:1.4}
+.dr-days a small{display:block;font-family:var(--type);font-size:11px;color:var(--muted)}
+.dr-days a[aria-current="page"]{background:var(--paper)}
+.dr-days a.now b::after{content:" ●";font-size:9px;vertical-align:2px}
+.dr-trips{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.dr-trips li{padding:10px 14px;border:1px solid var(--line);border-radius:4px;background:var(--paper)}
+.dr-trips li.on{border-color:var(--ink)}
+.dr-trips li.soon{background:transparent;border-style:dashed;color:var(--muted)}
+.dr-trips strong{display:block;font-size:15px;font-weight:400}
+.dr-trips small{font-size:12px;color:var(--muted)}
+/* folds */
+.fold{margin:20px 18px 0;background:var(--paper);border:1px solid var(--line);border-radius:4px}
+.fold summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:baseline;gap:10px;font-size:15.5px;letter-spacing:.1em}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary::after{content:"＋";margin-left:auto;color:var(--muted);font-size:14px}
+.fold[open] summary::after{content:"－"}
+.fold summary small{font-size:12px;color:var(--muted);letter-spacing:0}
+.fold .cap{margin:4px 14px 6px;font-size:13px}
+.fold .sheet{margin:0 10px;padding:2px 12px}
+.fold table{font-size:13.5px}
+.fold td{padding:6px 0}
+.fold .total{margin:10px 10px 0}
+.fold .total div{padding:9px 12px;border-width:1px}
+.fold .total strong{font-size:17px}
+.fold .foot{margin:8px 14px 12px;font-size:12px}
+.fold .pack{margin:0 10px;padding-bottom:10px;gap:6px}
+.fold .pack button{padding:8px 12px;grid-template-columns:26px minmax(0,1fr)}
+.fold .pack strong{font-size:14.5px}
+.fold .pack span{font-size:12.5px}
 .endnote{font-size:12px;color:var(--muted);margin:24px 20px 0;line-height:1.7}
 .spacer{height:44px}
 @media (prefers-reduced-motion:no-preference){ .view{animation:in .3s ease-out} @keyframes in{from{opacity:.35}to{opacity:1}} }
@@ -206,8 +259,10 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 </head>
 <body>
 <header class="bar"><div class="wrap">
-  <div class="bar-top"><a class="brand" href="#overview">冬雪北海道<small>QUEST MAP</small></a><nav class="nav" id="nav" aria-label="選單"></nav><button class="today" id="todayBtn" type="button">TODAY</button></div>
+  <div class="bar-top"><button class="burger" id="menuBtn" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button><a class="brand" href="#overview">冬雪北海道<small>QUEST MAP</small></a><button class="today" id="todayBtn" type="button">TODAY</button></div>
 </div></header>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" aria-label="選單" hidden></aside>
 <main class="wrap view" id="view"></main>
 <script>
 const DAYS = [{"n": 1, "date": "2026-11-24", "sub": "札幌", "title": "抵達北海道・雪具採買・烤肉與 moyuk 扭蛋", "items": [{"t": true, "when": "06:15–10:55", "title": "航班移動", "hours": null, "body": "台灣虎航 IT234 桃園起飛，10:55 抵達新千歲機場國際線，入境提領行李（含 3 套雪具與 3 大行李）。", "maps": []}, {"t": true, "when": "12:00–12:50", "title": "前往札幌市區", "hours": null, "body": "JR 快速 Airport 號至札幌站（約 37 分），轉地鐵南北線 1 站至大通站，或計程車約 5 分鐘。", "maps": [{"label": "路線", "o": "新千歳空港駅", "d": "大通駅"}]}, {"t": false, "when": "住宿", "title": "飯店辦理手續", "hours": null, "body": "抵達 La’gent Stay 札幌大通，辦理入住，大行李寄存櫃檯。", "maps": [{"label": "地圖", "q": "La'gent Stay Sapporo Odori"}]}, {"t": false, "when": "午餐", "title": "狸小路午餐", "hours": null, "body": "飯店對面狸小路 5 丁目周邊熱食，如 Suage+ 湯咖哩或在地拉麵。", "maps": [{"label": "地圖", "q": "狸小路5丁目 札幌"}]}, {"t": false, "when": "購物", "title": "二手雪具採買・兩階段策略", "hours": null, "body": "① 徒步圈：2nd STREET 狸小路 4 丁目店（雪靴／配件・10:00–21:00）→ Murasaki Sports 札幌 PARCO 4F（中古板、雪鞋試穿與角度調校・10:00–20:00）→ MOJANE（單板專門店）。買齊直接手提 3–5 分鐘回房。<br>② 備案：薄野搭定鐵巴士約 25 分鐘至 2nd OUTDOOR 川沿店 ＋ BOOKOFF PLUS 川沿店；買完合叫休旅計程車回飯店（約 20 分，約 3,000 円）。", "maps": [{"label": "2nd STREET", "q": "セカンドストリート 狸小路4丁目店"}, {"label": "Murasaki", "q": "ムラサキスポーツ 札幌パルコ"}, {"label": "MOJANE", "q": "MOJANE 札幌"}, {"label": "2nd OUTDOOR", "q": "2nd OUTDOOR 札幌川沿店"}]}, {"t": false, "when": "休整", "title": "返回飯店休整", "hours": null, "body": "雪板、雪鞋送入房間放置。", "maps": []}, {"t": false, "when": "晚餐", "title": "晚餐｜成吉思汗 いただきます。", "hours": "16:00–23:00", "body": "南 5 條西 5 丁目，步行約 5 分鐘。自營牧場純種薩福克生羊肉與內臟拼盤，鮮甜無羶。", "maps": [{"label": "地圖", "q": "ジンギスカン 羊飼いの店 いただきます。 札幌"}]}, {"t": false, "when": "扭蛋", "title": "扭蛋店 1｜ガチャガチャの森 moyukSAPPORO", "hours": "～20:00", "body": "moyuk SAPPORO 3F，森林風扭蛋牆、最新正版 IP 與生活模型。", "maps": [{"label": "地圖", "q": "ガチャガチャの森 moyukSAPPORO"}]}, {"t": false, "when": "購物", "title": "超市採買與裝備整頓", "hours": "唐吉訶德 24 小時", "body": "狸小路唐吉訶德採買高熱量零食、能量凍與早餐；回房將裝備裝袋。", "maps": [{"label": "地圖", "q": "ドン・キホーテ 札幌狸小路本店"}]}, {"t": false, "when": "溫泉", "title": "泡湯休整", "hours": null, "body": "館內 3F 天然地底溫泉「ぽんの湯」。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 2, "date": "2026-11-25", "sub": "滑雪 Day 1", "title": "札幌國際滑雪場・雪具寄放・AOAO 水族館", "items": [{"t": false, "when": "出發", "title": "晨間整頓・步行出發", "hours": null, "body": "換穿雪服，攜雪板袋、雪靴袋與隨身包，步行 3 分鐘至對面札幌東急 REI 酒店正門。", "maps": [{"label": "地圖", "q": "札幌東急REIホテル"}]}, {"t": true, "when": "08:50–10:20", "title": "專車上山", "hours": null, "body": "定鐵巴士預約專車，雪板放車底行李艙，直達滑雪中心。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "購票與更衣", "hours": null, "body": "領取纜車票，更衣室換雪靴，便鞋鎖進置物櫃。", "maps": []}, {"t": false, "when": "滑雪", "title": "暢滑雪道", "hours": "平日 9:00–17:00", "body": "札幌國際滑雪場。適應新板腳感，暢滑天然粉雪；午餐於雪場 2F 餐廳。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "雪具過夜寄存", "hours": null, "body": "換回便鞋，3 套雪板與雪靴送至滑雪中心 B1F Cloak 人工寄存處（每件約 300–500 円／晚）。", "maps": []}, {"t": true, "when": "16:00–17:30", "title": "專車返回市區", "hours": null, "body": "雙手空空搭 16:00 巴士回東急 REI，步行回飯店換保暖便服。", "maps": []}, {"t": false, "when": "晚餐", "title": "晚餐｜湯咖哩二選一", "hours": null, "body": "<b>首選 Soup Curry TREASURE</b>（南 2 條西 1 丁目，步行約 4 分）：和風海鮮高湯，39 席、營業 11:30–22:30，3 人好入座。<b>備案 SOUP CURRY KING セントラル</b>（南 2 條西 3 丁目 B1）：豚骨雞骨＋和風雙湯頭的超人氣名店，座位少常排隊，離 AOAO 最近。", "maps": [{"label": "TREASURE", "q": "スープカレー TREASURE 札幌"}, {"label": "KING", "q": "SOUP CURRY KING セントラル 札幌"}]}, {"t": false, "when": "景點", "title": "AOAO SAPPORO 都市水族館", "hours": "10:00–22:00・最後入館 21:00", "body": "moyuk SAPPORO 4–6F。避開風雪，看跳岩企鵝、發光水母與沉浸式光影海洋展。", "maps": [{"label": "地圖", "q": "AOAO SAPPORO"}]}, {"t": false, "when": "扭蛋", "title": "扭蛋店 2｜#C-pla 狸小路 5 丁目店", "hours": "10:00–22:00", "body": "800–1,000 台扭蛋機，動漫、搞怪小物與懷舊系列。", "maps": [{"label": "地圖", "q": "#C-pla 狸小路5丁目店"}]}, {"t": false, "when": "溫泉", "title": "溫泉舒緩", "hours": null, "body": "步行 1 分鐘回房，「ぽんの湯」舒緩大腿肌肉。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 3, "date": "2026-11-26", "sub": "滑雪 Day 2", "title": "味噌拉麵・Nikka 爺爺・PARCO 扭蛋・白色燈樹節", "items": [{"t": false, "when": "出發", "title": "輕裝出發", "hours": null, "body": "房內早餐，只背隨身小包（雪鏡、手套），步行 3 分鐘至東急 REI 前搭車。", "maps": [{"label": "地圖", "q": "札幌東急REIホテル"}]}, {"t": true, "when": "08:50–10:40", "title": "專車上山・領雪具", "hours": null, "body": "雙手空空搭專車，至 B1F Cloak 憑牌領出雪板與雪靴。", "maps": []}, {"t": false, "when": "滑雪", "title": "暢滑雪道", "hours": "平日 9:00–17:00", "body": "札幌國際滑雪場全天粉雪；中午雪場餐廳用餐。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "再次過夜寄存", "hours": null, "body": "換回便鞋，雪具交回 B1F Cloak，隔天滑完再領。", "maps": []}, {"t": true, "when": "16:00–18:15", "title": "回市區・換裝整備", "hours": null, "body": "16:00 巴士約 17:15–17:30 抵東急 REI；回飯店換保暖便服、防寒大衣與防滑便鞋。", "maps": []}, {"t": false, "when": "晚餐", "title": "晚餐｜麵屋 雪風 薄野本店", "hours": "18:00–翌 3:00", "body": "南 7 條西 4 丁目，步行約 6 分鐘。晚餐時段早點到可避開續攤與深夜長隊；三種味噌調配的濃郁熱湯，配炙燒叉燒與溏心蛋，迅速補足體力。", "maps": [{"label": "地圖", "q": "麺屋 雪風 すすきの"}]}, {"t": false, "when": "景點", "title": "Nikka Whisky Sign", "hours": "夜間點燈", "body": "往北 2 個街區至薄野十字路口，在彩色霓虹「威士忌爺爺」下合影，感受不夜城。", "maps": [{"label": "地圖", "q": "ニッカウヰスキー 看板 すすきの交差点"}]}, {"t": false, "when": "購物", "title": "札幌 PARCO｜CASETiFY ＆ #C-pla", "hours": "PARCO 10:00–20:00", "body": "沿站前通北行約 3 分鐘。1F CASETiFY STUDIO 挑北海道限定或聯名手機殼，再上 7F #C-pla 快速轉限定扭蛋。", "maps": [{"label": "地圖", "q": "札幌PARCO"}]}, {"t": false, "when": "景點", "title": "大通公園・白色燈樹節＆耶誕市集", "hours": "燈飾約 16:30–22:00・市集至 21:00", "body": "步行 2 分鐘。白雪光雕與橘紅暖光的札幌電視塔；1–2 丁目慕尼黑耶誕市集（最後點餐 20:45）品嚐德國美食、熱紅酒，挑雪花球與耶誕雜貨。", "maps": [{"label": "地圖", "q": "大通公園 西2丁目 札幌"}]}, {"t": false, "when": "溫泉", "title": "漫步回房・泡湯", "hours": null, "body": "步行 3–4 分鐘返回飯店，「ぽんの湯」舒緩全身。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 4, "date": "2026-11-27", "sub": "滑雪 Day 3", "title": "札幌國際收官・雪具載回・夜聖代・薄野漫步", "items": [{"t": true, "when": "07:30–10:40", "title": "出發・上山・領雪具", "hours": null, "body": "輕裝步行至東急 REI 前，08:50 專車直達滑雪中心，至 B1F Cloak 憑牌領出裝備。", "maps": [{"label": "地圖", "q": "札幌東急REIホテル"}]}, {"t": false, "when": "滑雪", "title": "札幌國際最後一天", "hours": "平日 9:00–17:00", "body": "盡情享受粉雪；中午雪場餐廳用餐。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "領回全部雪具並裝袋", "hours": null, "body": "領出 3 人雪板與雪靴，完整裝入雪板袋封妥，準備隨車載回。", "maps": []}, {"t": true, "when": "16:00–17:30", "title": "專車載運裝備回市區", "hours": null, "body": "雪板袋放行李艙，抵東急 REI 後提著裝備步行 3 分鐘回房。", "maps": []}, {"t": false, "when": "休整", "title": "飯店休整換裝", "hours": null, "body": "換穿輕鬆保暖便服。", "maps": []}, {"t": false, "when": "晚餐", "title": "悠閒晚餐", "hours": null, "body": "薄野／狸小路隨性小品：在地居酒屋小食、烤鳥串或熱湯定食。", "maps": []}, {"t": false, "when": "甜點", "title": "結尾夜聖代（シメパフェ）｜Parfaiteria Pal", "hours": "週五 18:00–翌 2:00", "body": "南 4 條西 2 丁目 10-1 6F，步行約 3 分鐘。生乳霜淇淋、酸甜雪酪與時令水果雕琢的藝術聖代。", "maps": [{"label": "地圖", "q": "パフェテリア パル 札幌"}]}, {"t": false, "when": "散策", "title": "薄野至狸小路夜遊", "hours": "唐吉訶德 24 小時", "body": "沿薄野中央通穿梭至狸小路拱廊，逛特色小店、藥妝或唐吉訶德，看覆雪街道霓虹。", "maps": [{"label": "地圖", "q": "狸小路商店街"}]}, {"t": false, "when": "溫泉", "title": "最後一晚ぽんの湯", "hours": null, "body": "行李隔天退房前順手整理裝箱即可。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 5, "date": "2026-11-28", "sub": "札幌 → 富良野", "title": "雙神社地鐵巡禮・高速大巴轉場新富良野", "items": [{"t": true, "when": "08:30–09:00", "title": "退房・裝備轉移寄放", "hours": null, "body": "大通飯店退房，計程車將大裝備送往 JR 札幌站北口寄放。", "maps": [{"label": "地圖", "q": "JR札幌駅 北口"}]}, {"t": false, "when": "景點", "title": "北海道神宮", "hours": "開放 11 月 7:00–16:00", "body": "地鐵至圓山公園站，悠閒參拜，於六花亭神宮茶屋享用現烤判官餅。", "maps": [{"label": "地圖", "q": "北海道神宮"}]}, {"t": true, "when": "10:45–11:20", "title": "神社間大眾運輸動線", "hours": null, "body": "北海道神宮 → 札幌諏訪神社，合併計費僅 250 円／人<ol class=\"steps\"><li>步行 10–12 分：穿過「公園口鳥居」至圓山公園站 3 號入口</li><li>東西線約 5 分：圓山公園 → 大通（往新札幌，3 站），依藍色東豐線指標前進</li><li>站內轉乘 4–5 分：地下連通道至東豐線月台（往榮町）</li><li>東豐線約 5 分：大通 → 北 13 條東（3 站）</li><li>步行約 3 分：2 號出口直走抵諏訪神社正門</li></ol>", "maps": [{"label": "路線", "o": "北海道神宮", "d": "札幌諏訪神社"}]}, {"t": false, "when": "景點", "title": "札幌諏訪神社", "hours": "參拜自由", "body": "季節鮮花手水，求取特色御朱印。", "maps": [{"label": "地圖", "q": "札幌諏訪神社"}]}, {"t": false, "when": "午餐", "title": "漫步回札幌站北口・午餐", "hours": null, "body": "往西南步行約 10–12 分鐘。", "maps": [{"label": "地圖", "q": "JR札幌駅 北口"}]}, {"t": false, "when": "購物", "title": "車上點心・提領裝備", "hours": "大丸 10:00–20:00", "body": "站前シマエナガ Creperie 買雪之妖精造型甜點當車上點心（或大丸 B1 外帶），領回雪具與大行李。", "maps": [{"label": "地圖", "q": "大丸札幌店"}]}, {"t": true, "when": "14:25–14:50", "title": "札幌站前 2 號站牌", "hours": null, "body": "排隊搭乘 14:50 發車的高速富良野號。", "maps": [{"label": "地圖", "q": "札幌駅前 高速ふらの号 のりば"}]}, {"t": true, "when": "14:50–17:22", "title": "高速富良野號", "hours": null, "body": "一路前往富良野，17:22 抵達 JR 富良野站前。", "maps": [{"label": "路線", "o": "札幌駅前", "d": "富良野駅"}]}, {"t": true, "when": "17:22–17:48", "title": "轉乘快速薰衣草號", "hours": null, "body": "站前公車乘車處轉乘富良野巴士「快速薰衣草號」（或西達布線），17:30 發車，17:48 直達新富良野王子大飯店。", "maps": [{"label": "路線", "o": "富良野駅", "d": "新富良野プリンスホテル"}]}, {"t": false, "when": "住宿", "title": "入住・百匯晚餐・泡湯", "hours": null, "body": "行李送入房間，享用飯店豐盛百匯晚餐，泡湯放鬆。", "maps": [{"label": "地圖", "q": "新富良野プリンスホテル"}]}], "stay": "新富良野王子大飯店", "stayq": "新富良野プリンスホテル", "note": null}, {"n": 6, "date": "2026-11-29", "sub": "富良野滑雪首日", "title": "Furano Zone 暢滑", "items": [{"t": false, "when": "早餐", "title": "晨間整裝", "hours": null, "body": "挑高雪景自助百匯早餐，1F 取出雪板。", "maps": []}, {"t": false, "when": "滑雪", "title": "富良野全日暢滑", "hours": "8:30–16:00", "body": "Ski-out 直接開滑，寬廣壓雪道與鬆雪；午餐雪場餐廳熱食。", "maps": [{"label": "地圖", "q": "富良野スキー場 富良野ゾーン"}]}, {"t": false, "when": "溫泉", "title": "溫泉放鬆", "hours": null, "body": "浸泡「紫彩之湯」天然溫泉。", "maps": [{"label": "地圖", "q": "富良野温泉 紫彩の湯"}]}, {"t": false, "when": "晚餐", "title": "百匯晚餐", "hours": null, "body": "飯店內豐盛晚餐，大廳壁爐區放鬆休息。", "maps": [{"label": "地圖", "q": "新富良野プリンスホテル"}]}], "stay": "新富良野王子大飯店（兩晚）", "stayq": "新富良野プリンスホテル", "note": null}, {"n": 7, "date": "2026-11-30", "sub": "富良野滑雪次日", "title": "登山纜車與頂級粉雪", "items": [{"t": false, "when": "滑雪", "title": "登山纜車暢滑", "hours": "8:30–16:00", "body": "富良野空中纜車（Ropeway）直達山頂，遠眺十勝岳連峰，暢滑長距離巡航滑道與粉雪地形。", "maps": [{"label": "地圖", "q": "富良野ロープウェー"}]}, {"t": false, "when": "溫泉", "title": "泡湯與預先收納", "hours": null, "body": "享受溫泉，將非必要換洗衣物先收進大行李箱，利於隔日迅速退房。", "maps": [{"label": "地圖", "q": "富良野温泉 紫彩の湯"}]}, {"t": false, "when": "晚餐", "title": "晚餐放鬆", "hours": null, "body": "飯店晚餐，漫步夜間精靈露台。", "maps": [{"label": "地圖", "q": "ニングルテラス"}]}], "stay": "新富良野王子大飯店（兩晚）", "stayq": "新富良野プリンスホテル", "note": null}, {"n": 8, "date": "2026-12-01", "sub": "富良野 → 札幌", "title": "富良野壓軸粉雪・全程大眾運輸回札幌", "items": [{"t": false, "when": "退房", "title": "早餐・退房", "hours": null, "body": "自助百匯早餐後退房，大行李寄放櫃檯；1F 乾燥置物櫃取出雪板雪靴，直接換裝開滑。", "maps": []}, {"t": false, "when": "滑雪", "title": "壓軸粉雪日", "hours": "8:30–16:00", "body": "盡享富良野 Zone 寬廣雪道與優質粉雪，中午雪場餐廳熱食。", "maps": [{"label": "地圖", "q": "富良野スキー場"}]}, {"t": false, "when": "整裝", "title": "準時收工・換裝・封袋", "hours": null, "body": "準時滑回飯店門口，換回便服與防滑鞋；擦乾雪板，3 人雪板雪靴裝袋封妥；領回大行李清點。", "maps": []}, {"t": true, "when": "15:55–16:15", "title": "第一段｜快速薰衣草號", "hours": null, "body": "飯店正門玄關外候車亭上車 → JR 富良野站前，每人 260 円（投現或刷卡）。", "maps": [{"label": "路線", "o": "新富良野プリンスホテル", "d": "富良野駅"}]}, {"t": true, "when": "16:15–16:50", "title": "車站轉乘緩衝", "hours": null, "body": "35 分鐘餘裕：候車室取暖、洗手間、採買車上飲品點心。", "maps": []}, {"t": true, "when": "16:50–19:25", "title": "第二段｜高速富良野號（當日末班）", "hours": null, "body": "富良野站前 → 札幌車站前，每人 2,500 円。雪板袋與大行李平放下層行李艙；車內暖氣、充電座，補眠約 2.5 小時。", "maps": [{"label": "路線", "o": "富良野駅", "d": "札幌駅"}]}, {"t": true, "when": "19:25–19:40", "title": "步行入住", "hours": null, "body": "提領雪具行李，經札幌站北口連通道步行約 5 分鐘至 KEIO PRELIA HOTEL Sapporo。", "maps": [{"label": "地圖", "q": "京王プレリアホテル札幌"}]}, {"t": false, "when": "晚餐", "title": "晚餐・大浴場", "hours": "Stellar Place 餐廳 11:00–23:00", "body": "Stellar Place 或大丸百貨美食街（如根室花丸壽司、熱拉麵）；回房享受專屬大浴場。", "maps": [{"label": "地圖", "q": "札幌ステラプレイス"}]}], "stay": "KEIO PRELIA HOTEL Sapporo", "stayq": "京王プレリアホテル札幌", "note": "當日交通每人僅 2,760 円（約 NT$ 590），經濟實惠且零搬運折騰。"}, {"n": 9, "date": "2026-12-02", "sub": "小樽 → 手稻 → 札幌", "title": "小樽海鮮運河・白色戀人公園點燈", "items": [{"t": true, "when": "08:30–09:15", "title": "札幌 → 南小樽", "hours": null, "body": "步行 5 分至 JR 札幌站，搭快速 Airport／區間快速往小樽方向，南小樽下車（約 40 分，750 円）。過「朝里」後右側車窗是石狩灣雪海。", "maps": [{"label": "路線", "o": "札幌駅", "d": "南小樽駅"}]}, {"t": false, "when": "景點", "title": "童話十字路口・堺町通", "hours": "音樂盒堂 9:00–18:00", "body": "南小樽站步行約 7 分：小樽音樂盒堂本館與蒸汽鐘 → 沿堺町通北行，LeTAO 本店早茶（雙層起司蛋糕，9:00–18:00）、北一硝子（10:00–18:00）、六花亭（10:00–18:00）、北菓樓。", "maps": [{"label": "音樂盒堂", "q": "小樽オルゴール堂 本館"}, {"label": "LeTAO", "q": "ルタオ 本店 小樽"}, {"label": "北一硝子", "q": "北一硝子 三号館"}]}, {"t": false, "when": "購物", "title": "大正硝子館", "hours": "9:00–18:00", "body": "堺町通北端轉入色內，挑選手工玻璃小物。", "maps": [{"label": "地圖", "q": "大正硝子館 本店 小樽"}]}, {"t": false, "when": "景點", "title": "小樽運河散策", "hours": "運河全天開放・運河館 9:30–17:00", "body": "步行 2 分至運河，淺草橋 → 中央橋紅磚倉庫步道拍雪景倒影，順遊小樽市綜合博物館運河館。", "maps": [{"label": "運河", "q": "小樽運河 浅草橋"}, {"label": "運河館", "q": "小樽市総合博物館 運河館"}]}, {"t": false, "when": "午餐", "title": "三角市場午餐", "hours": "約 6:00–17:00・各店不同", "body": "步行約 10 分至小樽站旁。海鮮丼（海膽、干貝、鮭魚卵）配花咲蟹味噌湯。", "maps": [{"label": "地圖", "q": "小樽 三角市場"}]}, {"t": false, "when": "景點", "title": "船見坂 → 小樽站", "hours": "全天開放", "body": "步行 2 分至船見坂拍坡道海景，再走 4 分進 JR 小樽站。", "maps": [{"label": "地圖", "q": "船見坂 小樽"}]}, {"t": true, "when": "13:45–14:50", "title": "小樽 → 白色戀人公園", "hours": null, "body": "JR 往札幌方向至手稻站（約 30 分）。末端接駁：A 計程車約 10 分（約 1,800 円，每人 600 円）；B JR 巴士宮 49／手 41 至「西町北 20 丁目」步行 5 分（210 円）。", "maps": [{"label": "路線", "o": "小樽駅", "d": "白い恋人パーク"}]}, {"t": false, "when": "景點", "title": "白色戀人公園", "hours": "10:00–18:00・有料區最後入館 16:30", "body": "餅乾產線、巧克力博物館、生巧克力霜淇淋與熱可可；傍晚天色轉暗，紅磚城堡與覆雪庭園冬季彩燈亮起。", "maps": [{"label": "地圖", "q": "白い恋人パーク"}]}, {"t": true, "when": "17:20–17:45", "title": "回札幌市區", "hours": null, "body": "步行 7 分至東西線宮之澤站（起點站必有座位）→ 大通站，15 分鐘，290 円。", "maps": [{"label": "路線", "o": "白い恋人パーク", "d": "大通駅"}]}, {"t": false, "when": "晚餐", "title": "慶功晚餐・免稅採買", "hours": null, "body": "大通地下街或狸小路，湯咖哩或成吉思汗；採買伴手禮藥妝後，南北線 1 站或地下街步行約 12 分回飯店。", "maps": [{"label": "地圖", "q": "狸小路商店街"}]}], "stay": "KEIO PRELIA HOTEL Sapporo", "stayq": "京王プレリアホテル札幌", "note": "單人全日交通約 1,700–2,000 円（約 NT$ 360–420），全程順路不趕時間。"}, {"n": 10, "date": "2026-12-03", "sub": "札幌 → 台灣", "title": "新千歲機場伴手禮・超規雪具托運・返台", "items": [{"t": true, "when": "08:30–09:00", "title": "退房出發", "hours": null, "body": "退房後步行 5 分鐘至 JR 札幌站月台。", "maps": [{"label": "地圖", "q": "京王プレリアホテル札幌"}]}, {"t": true, "when": "09:06–09:43", "title": "JR 快速 Airport 號", "hours": null, "body": "札幌站 → 新千歲機場站，約 37 分鐘，每人 1,150 円。", "maps": [{"label": "路線", "o": "札幌駅", "d": "新千歳空港駅"}]}, {"t": false, "when": "景點", "title": "哆啦A夢驚喜空中樂園", "hours": "10:00–18:00・入場至 17:30", "body": "連絡設施 3F Smile Road，大人 800 円。秘密道具主題遊樂區、限定商店與咖啡廳。", "maps": [{"label": "地圖", "q": "ドラえもん わくわくスカイパーク"}]}, {"t": false, "when": "購物", "title": "橡子共和國・伴手禮・午餐", "hours": null, "body": "吉卜力專賣店橡子共和國挑龍貓周邊；3F「北海道拉麵道場」一幻拉麵；六花亭、北菓樓、Kinotoya 起司塔、Royce’ 生巧克力。", "maps": [{"label": "橡子共和國", "q": "どんぐり共和国 新千歳空港"}, {"label": "拉麵道場", "q": "北海道ラーメン道場 新千歳空港"}]}, {"t": true, "when": "11:30–12:30", "title": "報到・長雪具托運", "hours": null, "body": "國際線櫃檯辦理登機與超規長雪板托運。", "maps": [{"label": "地圖", "q": "新千歳空港 国際線ターミナル"}]}, {"t": true, "when": "12:30–", "title": "出境返台", "hours": null, "body": "通關出境，免稅店最後採買，搭機返台，圓滿完成旅程。", "maps": []}], "stay": null, "stayq": null, "note": null}];
@@ -257,13 +312,45 @@ function todayIndex(){ const t = today0().getTime(); for (const d of DAYS) if (d
 function state(d){ const t = today0().getTime(), x = dayDate(d).getTime(); return x < t ? 'past' : x === t ? 'cur' : 'next'; }
 function daysUntil(){ return Math.round((dayDate(DAYS[0]) - today0()) / 86400000); }
 
+const TRIPS = [
+  { id: 'hokkaido-2026', name: '冬雪北海道', sub: '札幌・富良野・小樽', start: '2026-11-24', end: '2026-12-03', who: '浣熊・蕭・君', current: true }
+];
+function tripState(t){ const n = today0().getTime(), a = new Date(t.start + 'T00:00').getTime(), b = new Date(t.end + 'T00:00').getTime(); return n < a ? '即將出發' : n > b ? '已完成' : '旅行中'; }
 function renderNav(cur){
-  const nav = document.getElementById('nav');
-  let h = '<a class="word" href="#overview"' + (cur==='overview'?' aria-current="page"':'') + '><b>地圖</b><small>MAP</small></a>';
-  h += '<a class="word" href="#cost"' + (cur==='cost'?' aria-current="page"':'') + '><b>錢錢</b><small>MONEY</small></a>';
-  nav.innerHTML = h;
-  const a = nav.querySelector('[aria-current]'); if (a) a.scrollIntoView({block:'nearest', inline:'center'});
+  const d = document.getElementById('drawer'); if (!d) return;
+  const ti = todayIndex();
+  const link = (href, main, sub, on) => '<a href="' + href + '"' + (on ? ' aria-current="page"' : '') + '><span>' + main + '</span>' + (sub ? '<small>' + sub + '</small>' : '') + '</a>';
+  let h = '<div class="dr-head"><span class="kicker">MENU</span><button class="dr-close" id="menuClose" type="button" aria-label="關閉選單">×</button></div>';
+  const t = TRIPS.find(x => x.current);
+  h += '<div class="dr-trip"><div class="kicker">NOW PLAYING</div><strong>' + t.name + '</strong><small>' + t.start.slice(5).replace('-','/') + ' – ' + t.end.slice(5).replace('-','/') + '・' + t.who + '</small></div>';
+  h += '<nav class="dr-sec" aria-label="本次旅程">' + link('#overview', '闖關地圖', 'MAP', cur === 'overview') + link('#cost', '錢錢・記帳分帳', 'MONEY', cur === 'cost') + '</nav>';
+  h += '<div class="dr-label">每日行程</div><nav class="dr-days" aria-label="每日行程">';
+  for (const x of DAYS) h += '<a href="#day' + x.n + '"' + (cur === 'day' + x.n ? ' aria-current="page"' : '') + (ti === x.n ? ' class="now"' : '') + '><b style="--c:' + C[x.n-1] + '">' + String(x.n).padStart(2,'0') + '</b><span>' + esc(SHORT[x.n-1]) + '<small>' + md(x) + '（' + WEEK[dayDate(x).getDay()] + '）</small></span></a>';
+  h += '</nav><div class="dr-label">我的旅程</div><ul class="dr-trips">';
+  for (const x of TRIPS) h += '<li' + (x.current ? ' class="on"' : '') + '><strong>' + x.name + '</strong><small>' + x.start.replace(/-/g,'/') + ' – ' + x.end.slice(5).replace('-','/') + '・' + tripState(x) + '</small></li>';
+  h += '<li class="soon"><strong>下一趟旅程</strong><small>之後規劃好的旅程會加在這裡</small></li></ul>';
+  d.innerHTML = h;
+  document.getElementById('menuClose').addEventListener('click', closeMenu);
 }
+function openMenu(){
+  const d = document.getElementById('drawer'), s = document.getElementById('scrim');
+  d.hidden = false; s.hidden = false; requestAnimationFrame(() => { d.classList.add('open'); s.classList.add('open'); });
+  document.getElementById('menuBtn').setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
+  const f = d.querySelector('[aria-current]') || d.querySelector('a'); if (f) f.focus({preventScroll:true});
+}
+function closeMenu(){
+  const d = document.getElementById('drawer'), s = document.getElementById('scrim');
+  if (d.hidden) return;
+  d.classList.remove('open'); s.classList.remove('open');
+  document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
+  setTimeout(() => { if (!d.classList.contains('open')) { d.hidden = true; s.hidden = true; } }, 220);
+}
+document.getElementById('menuBtn').addEventListener('click', () => document.getElementById('drawer').hidden ? openMenu() : closeMenu());
+document.getElementById('scrim').addEventListener('click', closeMenu);
+document.getElementById('drawer').addEventListener('click', e => { if (e.target.closest('a')) closeMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 
 /* world map */
 const WM = { W:360, top:120, gap:104, xs:[96,262,286,150,74,210,292,168,70,214] };
@@ -469,7 +556,7 @@ const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 function renderCost(){
   let h = '<section class="stagehead" style="--c:var(--mustard)"><div class="kicker"><b>MONEY</b>　錢錢</div><h1>記帳與預算</h1><div class="route">全團 3 人</div></section>';
   h += renderLedgerShell();
-  h += '<h2>預算表</h2>';
+  h += '<details class="fold"><summary>預算表<small>已付 NT$ 72,330・總預估 ≈ NT$ 98,653</small></summary>';
   h += '<p class="cap">一、已付款（機票＋住宿）</p><div class="sheet"><table>' +
     '<tr><td>台灣虎航 去回程</td><td>NT$ 29,559</td></tr><tr><td>La’gent Stay 4 晚</td><td>NT$ 18,190</td></tr>' +
     '<tr><td>新富良野王子 3 晚</td><td>NT$ 15,939</td></tr><tr><td>Keio Prelia 2 晚</td><td>NT$ 8,642</td></tr>' +
@@ -482,11 +569,11 @@ function renderCost(){
     '<tr><td>AOAO SAPPORO 水族館</td><td>6,600 円</td></tr><tr><td>白色戀人公園工廠</td><td>3,600 円</td></tr>' +
     '<tr class="sum"><td>小計（約 NT$ 2,193）</td><td>10,200 円</td></tr></table></div>';
   h += '<div class="total"><div><small>全團 10 天總支出</small><strong>≈ NT$ 98,653</strong></div><div><small>每人平均</small><strong>≈ NT$ 32,884</strong></div></div>';
-  h += '<p class="foot">已含第一階段雪票；富良野雪場現場纜車票、每日餐飲與購物依個人情況另計。</p>';
-  h += '<h2>裝備欄</h2><ul class="pack">';
+  h += '<p class="foot">已含第一階段雪票；富良野雪場現場纜車票、每日餐飲與購物依個人情況另計。</p></details>';
+  h += '<details class="fold"><summary>裝備欄<small id="packcount">已準備 ' + PACK.filter((_,i) => done['p-'+i]).length + ' / ' + PACK.length + '</small></summary><ul class="pack">';
   PACK.forEach((p,i) => { const k = 'p-'+i;
     h += '<li data-k="' + k + '"' + (done[k]?' class="done"':'') + '><button type="button" aria-pressed="' + (done[k]?'true':'false') + '"><span class="box">' + TICK + '</span><span><strong>' + p[0] + '</strong><span>' + p[1] + '</span></span></button></li>'; });
-  return h + '</ul><div class="spacer"></div>';
+  return h + '</ul></details><div class="spacer"></div>';
 }
 
 
@@ -518,7 +605,7 @@ function toTWD(e){ return e.cur === 'TWD' ? e.amount : e.amount * L.rate; }
 function defaultDay(){ const ti = todayIndex(); return ti ? String(ti) : '0'; }
 
 function renderLedgerShell(){
-  let h = '<div class="sync' + (L.mode === 'db' ? ' live' : '') + '" id="sync"><i></i><span>' + syncText() + '</span></div>';
+  let h = '';
   h += '<div id="spent"></div>';
   if (L.canWrite) {
     h += '<form class="addform" id="addform" autocomplete="off" novalidate>';
@@ -700,6 +787,7 @@ document.getElementById('view').addEventListener('click', e => {
   const li = b.closest('[data-k]'), k = li.dataset.k;
   if (done[k]) delete done[k]; else done[k] = 1; save();
   li.classList.toggle('done', !!done[k]); b.setAttribute('aria-pressed', done[k] ? 'true' : 'false');
+  const pc = document.getElementById('packcount'); if (pc) pc.textContent = '已準備 ' + PACK.filter((_,i) => done['p-'+i]).length + ' / ' + PACK.length;
 });
 document.getElementById('todayBtn').addEventListener('click', () => {
   const ti = todayIndex(), target = ti ? '#day' + ti : '#overview';
