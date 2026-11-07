@@ -12,7 +12,7 @@
 - `/* world map */`、`renderWorld`：首頁地圖與插圖；`/* ===== team animation ===== */`：三人走路與飛機動畫。
 - `/* ===== trip backgrounds ===== */`：各旅程背景插畫與選單插畫。
 - `const TRIPS = [`：Hamburger Menu 的旅程清單；新增旅程要加在這裡，並在 `show()` 的路由加上對應的 hash。
-- `/* ===== ledger ===== */`：記帳、分攤（平均或自訂金額）、日幣/台幣分開計與結算、匯率自動帶入。
+- `/* ===== ledger ===== */`：記帳、分攤（平均或自訂金額）、日幣/台幣分開計與結算、匯率（手動輸入即存並同步，或按「改用網路最新匯率」）。
 - `FIREBASE_CONFIG`、`TRIP_ID`：記帳同步用的 Firestore 設定；資料在 `trips/{TRIP_ID}/expenses`，共用匯率在 `trips/{TRIP_ID}/meta/rate`。Firebase SDK 版本寫在 `connectFirebase()` 的 `FB` 網址裡，只在第一次進「錢錢」頁才載入。
 
 ## 規則

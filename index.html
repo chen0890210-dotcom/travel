@@ -764,7 +764,7 @@ const CATS = [['餐飲','var(--rose)'],['交通','var(--blue)'],['滑雪','var(-
 const CATC = Object.fromEntries(CATS);
 const WHO = [['浣熊','var(--plum)'],['蕭','var(--blue)'],['君','var(--rose)']];
 const PEOPLE = WHO.map(w => w[0]);
-const L = { list: [], rate: 0.205, rateTs: 0, rateSrc: '預設', mode: 'local', backend: null, shared: false, cur: 'JPY', cat: '餐飲', who: '', split: PEOPLE.slice(), smode: 'even', editing: null };
+const L = { list: [], rate: 0.205, rateTs: 0, rateSrc: '預設', mode: 'local', backend: null, shared: false, rateMsg: '', rateMsgT: 0, cur: 'JPY', cat: '餐飲', who: '', split: PEOPLE.slice(), smode: 'even', editing: null };
 function loadLocal(){ try { L.list = JSON.parse(localStorage.getItem('hk-ledger') || '[]') || []; } catch (e) { L.list = []; } }
 function saveLocal(){ try { localStorage.setItem('hk-ledger', JSON.stringify(L.list)); } catch (e) {} }
 loadLocal();
@@ -776,13 +776,16 @@ function saveRate(){ try { localStorage.setItem('hk-rate2', JSON.stringify({ rat
 function setRateLocal(rate, src, ts){
   L.rate = rate; L.rateTs = ts || Date.now(); L.rateSrc = src; saveRate();
   const inp = document.getElementById('f-rate'); if (inp) inp.value = L.rate;
-  const n = document.getElementById('ratenote'); if (n) n.textContent = rateNote();
+  const n = document.getElementById('ratenote'); if (n) n.textContent = rateText();
   renderLedger();
 }
-/* 手動輸入或「自動帶入」：已連線時寫到 Firestore，三支手機一起用同一個匯率 */
+/* 手動輸入或「改用網路最新匯率」：已連線時寫到 Firestore，三支手機一起用同一個匯率 */
 function commitRate(rate, src){
+  const cloud = L.mode === 'db' && L.backend && L.backend.setRate;
   setRateLocal(rate, src);
-  if (L.mode === 'db' && L.backend && L.backend.setRate) L.backend.setRate(rate);
+  setRateMsg(src === '自動' ? '已改用網路最新匯率 ' + rate + (cloud ? '，並同步給三人' : '（只存在這支手機）')
+    : '已儲存' + (cloud ? '並同步給三人' : '（只存在這支手機）') + '：' + rate);
+  if (cloud) L.backend.setRate(rate);
 }
 function applyShared(snap){
   const d = snap.exists() ? snap.data() : null;
@@ -790,6 +793,13 @@ function applyShared(snap){
   else { L.shared = false; if (L.rateSrc === '共用') { L.rateSrc = '手動'; saveRate(); } updateSync(); }
 }
 function rateNote(){ if (!L.rateTs) return '尚未自動更新，先用預設值'; const d = new Date(L.rateTs); return (L.rateSrc === '共用' ? '三人共用' : L.rateSrc) + '・' + (d.getMonth()+1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+/* 說明文字：有「剛剛發生的事」就先顯示它（幾秒後自動消失），否則顯示匯率來源與時間 */
+function rateText(){ return L.rateMsg || rateNote(); }
+function setRateMsg(text, ms){
+  L.rateMsg = text; clearTimeout(L.rateMsgT);
+  const n = document.getElementById('ratenote'); if (n) n.textContent = rateText();
+  if (text) L.rateMsgT = setTimeout(() => { L.rateMsg = ''; const m = document.getElementById('ratenote'); if (m) m.textContent = rateText(); }, ms || 8000);
+}
 async function fetchRate(manual){
   const note = document.getElementById('ratenote'); if (note && manual) note.textContent = '更新中…';
   const tries = [
@@ -799,7 +809,7 @@ async function fetchRate(manual){
   for (const [u, pick] of tries) {
     try { const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) continue; const v = Number(pick(await r.json())); if (v > 0 && v < 5) { const rate = Math.round(v * 10000) / 10000; if (manual) commitRate(rate, '自動'); else if (!L.shared) setRateLocal(rate, '自動'); return true; } } catch (e) {}
   }
-  if (note) note.textContent = '無法取得最新匯率，維持 ' + L.rate + '（' + rateNote() + '）';
+  if (note && manual) setRateMsg('無法取得網路最新匯率，維持 ' + L.rate + '（' + rateNote() + '）', 10000);
   return false;
 }
 function defaultDay(){ const ti = todayIndex(); return ti ? String(ti) : '0'; }
@@ -820,7 +830,7 @@ function renderLedgerShell(){
   h += '<div class="chips" id="splitchips" role="group" aria-label="誰要分攤"' + (L.smode==='custom' ? ' hidden' : '') + '>' + chips('split', WHO, n => L.split.includes(n)) + '</div>';
   h += '<div class="shares" id="shares"' + (L.smode==='custom' ? '' : ' hidden') + '>' + PEOPLE.map(p => '<label class="sh"><span>' + p + '</span><input inputmode="decimal" data-share="' + p + '" placeholder="0" aria-label="' + p + ' 分攤金額"></label>').join('') + '<div class="shnote" id="shnote">每個人要分攤的金額，加起來要等於上面的金額</div></div></div>';
   h += '<button class="addbtn" id="addbtn" type="submit">' + (L.editing ? '儲存修改' : '記一筆') + '</button><div class="msg" id="msg" role="status"></div></form>';
-  h += '<details class="fold mfold"><summary>分帳結算<small id="settlesum"></small></summary><div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><button type="button" class="ratebtn" id="rateBtn">自動帶入</button><span class="ratenote" id="ratenote">' + rateNote() + '</span></div><p class="stlnote" id="ratehint"></p><div id="settle"></div></details>';
+  h += '<details class="fold mfold"><summary>分帳結算<small id="settlesum"></small></summary><div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><button type="button" class="ratebtn" id="rateBtn" title="會用網路上今天的匯率取代上面輸入的數字">改用網路最新匯率</button><span class="ratenote" id="ratenote">' + rateText() + '</span></div><p class="stlnote" id="ratehint"></p><div id="settle"></div></details>';
   h += '<details class="fold mfold ledfold"><summary>明細<small id="ledsum"></small></summary><p class="h2note in">點一筆可以修改</p><div id="spent"></div><div id="ledger"></div></details>';
   h += '<details class="fold mfold"><summary>花費分類</summary><div id="bars"></div></details>';
   return h;
@@ -964,7 +974,7 @@ document.getElementById('view').addEventListener('click', ev => {
   const mb = ev.target.closest('[data-smode]'); if (mb) { setMode(mb.dataset.smode); return; }
   const kb = ev.target.closest('[data-cat]'); if (kb) { L.cat = kb.dataset.cat; setPressed('cat', v => v === L.cat); return; }
   if (ev.target.closest('#cancelEdit')) { endEdit(); return; }
-  if (ev.target.closest('#rateBtn')) { fetchRate(true).then(ok => { const n = document.getElementById('ratenote'); if (ok && n) n.textContent = rateNote(); }); return; }
+  if (ev.target.closest('#rateBtn')) { fetchRate(true); return; }
   const eb = ev.target.closest('[data-edit]'); if (eb) { startEdit(eb.dataset.edit); return; }
   const db = ev.target.closest('.del'); if (db) {
     if (!db.classList.contains('armed')) {
@@ -1018,8 +1028,8 @@ function updateSync(){
   el.lastElementChild.textContent = live ? '已連線・三人即時同步' : wait ? '連線中…' : FIREBASE_CONFIG ? '未連線・目前只存在這支手機' : '未啟用雲端同步・只存在這支手機';
   const h = document.getElementById('ratehint');
   if (h) h.textContent = !live ? '尚未連線，匯率只存在這支手機，三個人看到的金額可能不一樣。'
-    : L.shared ? '三人共用這個匯率。要改的話輸入新匯率或按「自動帶入」，三個人會一起更新。'
-    : '最後結算時，由一個人按「自動帶入」或輸入匯率，三個人就會看到同一個匯率與同一組轉帳金額。';
+    : L.shared ? '三人共用這個匯率。輸入數字後按 Enter 或點到別處就會儲存並同步；「改用網路最新匯率」會用網路上今天的匯率取代你輸入的數字。'
+    : '最後結算時，由一個人輸入匯率（按 Enter 或點到別處就會儲存），或按「改用網路最新匯率」，三個人就會看到同一個匯率與同一組轉帳金額。';
 }
 async function connectFirebase(){
   if (!FIREBASE_CONFIG) return;
@@ -1040,7 +1050,7 @@ async function connectFirebase(){
       add: e => { const ref = fs.doc(col); e.id = ref.id; fs.setDoc(ref, clean(e)).catch(writeFailed); },
       set: (id, e) => { e.id = id; fs.setDoc(fs.doc(col, id), clean(e)).catch(writeFailed); },
       del: id => { fs.deleteDoc(fs.doc(col, id)).catch(writeFailed); },
-      setRate: r => { fs.setDoc(rateRef, { rate: r, ts: Date.now() }).catch(err => { const n = document.getElementById('ratenote'); if (n) n.textContent = '匯率沒能存到雲端，目前只套用在這支手機' + errHint(err); }); }
+      setRate: r => { fs.setDoc(rateRef, { rate: r, ts: Date.now() }).catch(err => setRateMsg('匯率沒能存到雲端，目前只套用在這支手機' + errHint(err), 20000)); }
     };
     fs.onSnapshot(rateRef, applyShared, () => {});
     fs.onSnapshot(col, { includeMetadataChanges: true }, snap => {
@@ -1062,7 +1072,7 @@ function show(){
   view.innerHTML = id === 'overview' ? renderOverview() : id === 'cost' ? renderCost() : id === 'ishigaki' ? renderIshigaki() : renderDay(DAYS[Number(id.slice(3)) - 1]);
   renderNav(id); window.scrollTo(0, 0);
   ANIM++;
-  if (id === 'cost') { startLedger(); renderLedger(); if (!L.shared && L.rateSrc !== '手動' && (Date.now() - L.rateTs > 6 * 3600000 || L.rateSrc === '預設')) fetchRate(false).then(ok => { const n = document.getElementById('ratenote'); if (ok && n) n.textContent = rateNote(); }); }
+  if (id === 'cost') { startLedger(); renderLedger(); if (!L.shared && L.rateSrc !== '手動' && (Date.now() - L.rateTs > 6 * 3600000 || L.rateSrc === '預設')) fetchRate(false); }
   if (id === 'overview') { requestAnimationFrame(() => playToday()); const pb = el('playbtn'); if (pb) pb.addEventListener('click', playAll); }
 }
 document.getElementById('view').addEventListener('click', e => {
