@@ -783,8 +783,7 @@ function setRateLocal(rate, src, ts){
 function commitRate(rate, src){
   const cloud = L.mode === 'db' && L.backend && L.backend.setRate;
   setRateLocal(rate, src);
-  setRateMsg(src === '自動' ? '已改用網路最新匯率 ' + rate + (cloud ? '，並同步給三人' : '（只存在這支手機）')
-    : '已儲存' + (cloud ? '並同步給三人' : '（只存在這支手機）') + '：' + rate);
+  setRateMsg(src === '自動' ? '' : '已儲存' + (cloud ? '並同步給三人' : '（只存在這支手機）') + '：' + rate);
   if (cloud) L.backend.setRate(rate);
 }
 function applyShared(snap){
@@ -830,7 +829,7 @@ function renderLedgerShell(){
   h += '<div class="chips" id="splitchips" role="group" aria-label="誰要分攤"' + (L.smode==='custom' ? ' hidden' : '') + '>' + chips('split', WHO, n => L.split.includes(n)) + '</div>';
   h += '<div class="shares" id="shares"' + (L.smode==='custom' ? '' : ' hidden') + '>' + PEOPLE.map(p => '<label class="sh"><span>' + p + '</span><input inputmode="decimal" data-share="' + p + '" placeholder="0" aria-label="' + p + ' 分攤金額"></label>').join('') + '<div class="shnote" id="shnote">每個人要分攤的金額，加起來要等於上面的金額</div></div></div>';
   h += '<button class="addbtn" id="addbtn" type="submit">' + (L.editing ? '儲存修改' : '記一筆') + '</button><div class="msg" id="msg" role="status"></div></form>';
-  h += '<details class="fold mfold"><summary>分帳結算<small id="settlesum"></small></summary><div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><button type="button" class="ratebtn" id="rateBtn" title="會用網路上今天的匯率取代上面輸入的數字">改用網路最新匯率</button><span class="ratenote" id="ratenote">' + rateText() + '</span></div><p class="stlnote" id="ratehint"></p><div id="settle"></div></details>';
+  h += '<details class="fold mfold"><summary>分帳結算</summary><div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><button type="button" class="ratebtn" id="rateBtn" title="會用網路上今天的匯率取代上面輸入的數字">改用網路最新匯率</button><span class="ratenote" id="ratenote">' + rateText() + '</span></div><p class="stlnote" id="ratehint"></p><div id="settle"></div></details>';
   h += '<details class="fold mfold ledfold"><summary>明細<small id="ledsum"></small></summary><p class="h2note in">點一筆可以修改</p><div id="spent"></div><div id="ledger"></div></details>';
   h += '<details class="fold mfold"><summary>花費分類</summary><div id="bars"></div></details>';
   return h;
@@ -912,7 +911,6 @@ function renderSettle(list){
   else h += '<div class="xfer">' + tr.map(([a,b,x]) => '<div><span class="p">' + a + '</span><span class="arrow">付給 →</span><span class="p">' + b + '</span><span class="amt">NT$ ' + fmt(x) + '<small>或 ' + fmt(x / L.rate) + ' 円</small></span></div>').join('') + '</div>';
   if (skipped) h += '<p class="skip">有 ' + skipped + ' 筆沒有選付款人，未列入分帳。</p>';
   box.innerHTML = h;
-  const ss = document.getElementById('settlesum'); if (ss) ss.textContent = tr.length ? tr.length + ' 筆待轉帳' : (tot.JPY || tot.TWD) ? '大家打平' : '';
 }
 function errHint(err){ const c = err && err.code ? String(err.code).replace(/^firestore\//, '') : ''; return c ? '（' + c + (c === 'permission-denied' ? '：Firestore 規則不允許這次寫入，請確認規則已發布' : '') + '）' : ''; }
 function writeFailed(err){ const m = document.getElementById('msg'); if (m) { m.style.color = ''; m.textContent = '有一筆沒能存到雲端，請檢查網路後再試一次' + errHint(err); } }
@@ -1027,9 +1025,9 @@ function updateSync(){
   el.className = 'sync' + (live ? ' live' : wait ? ' wait' : '');
   el.lastElementChild.textContent = live ? '已連線・三人即時同步' : wait ? '連線中…' : FIREBASE_CONFIG ? '未連線・目前只存在這支手機' : '未啟用雲端同步・只存在這支手機';
   const h = document.getElementById('ratehint');
-  if (h) h.textContent = !live ? '尚未連線，匯率只存在這支手機，三個人看到的金額可能不一樣。'
-    : L.shared ? '三人共用這個匯率。輸入數字後按 Enter 或點到別處就會儲存並同步；「改用網路最新匯率」會用網路上今天的匯率取代你輸入的數字。'
-    : '最後結算時，由一個人輸入匯率（按 Enter 或點到別處就會儲存），或按「改用網路最新匯率」，三個人就會看到同一個匯率與同一組轉帳金額。';
+  if (h) { h.textContent = !live ? '尚未連線，匯率只存在這支手機，三個人看到的金額可能不一樣。'
+    : L.shared ? ''
+    : '最後結算時，由一個人輸入匯率（按 Enter 或點到別處就會儲存），或按「改用網路最新匯率」，三個人就會看到同一個匯率與同一組轉帳金額。'; h.hidden = !h.textContent; }
 }
 async function connectFirebase(){
   if (!FIREBASE_CONFIG) return;
