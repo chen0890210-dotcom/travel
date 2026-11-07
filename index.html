@@ -342,6 +342,21 @@ body[data-trip="ishigaki"] .bgart img{opacity:.3}
   .hl{grid-template-columns:repeat(2,minmax(0,1fr))}
   .drawer{width:360px}
 }
+.chart{display:flex;align-items:center;gap:14px;margin:10px 10px 0;padding:12px;background:var(--paper);border:1px solid var(--line);border-radius:4px}
+.donut{flex:none;width:132px}
+.donut svg{width:100%;height:auto;display:block}
+.donut .dk{font-size:9px;fill:var(--muted)}
+.donut .dv{font-family:var(--type);font-size:11px;font-weight:700;fill:var(--ink)}
+.legend2{list-style:none;margin:0;padding:0;flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.legend2 li{display:grid;grid-template-columns:10px minmax(0,1fr) auto;column-gap:8px;align-items:center;font-size:14px}
+.legend2 i{width:10px;height:10px;border-radius:50%}
+.legend2 b{font-family:var(--type);font-weight:700;text-align:right}
+.legend2 em{grid-column:2 / -1;font-style:normal;font-family:var(--type);font-size:12px;color:var(--muted)}
+.daychart{margin:10px 10px 0;padding:10px 12px 6px;background:var(--paper);border:1px solid var(--line);border-radius:4px}
+.daychart .dch{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.daychart svg{width:100%;height:auto;display:block}
+.daychart .bl{font-family:var(--type);font-size:9px;fill:var(--muted)}
+.daychart .bv{font-family:var(--type);font-size:8px;fill:var(--ink)}
 /* folds */
 .fold{margin:20px 18px 0;background:var(--paper);border:1px solid var(--line);border-radius:4px}
 .fold summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:baseline;gap:10px;font-size:15.5px;letter-spacing:.1em}
@@ -819,6 +834,31 @@ function renderLedgerShell(){
   h += '<details class="fold mfold ledfold"><summary>明細<small id="ledsum"></small></summary><p class="h2note in">點一筆可以修改</p><div id="spent"></div><div id="ledger"></div></details>';
   return h;
 }
+function chartHTML(list, byCat){
+  const cats = CATS.filter(([n]) => byCat[n] > 0), total = cats.reduce((a, [n]) => a + byCat[n], 0);
+  const R = 44, CIRC = 2 * Math.PI * R; let off = 0, ring = '';
+  for (const [n, c] of cats) {
+    const len = byCat[n] / total * CIRC;
+    ring += '<circle cx="60" cy="60" r="' + R + '" fill="none" stroke="' + c + '" stroke-width="18" stroke-dasharray="' + Math.max(0, len - (cats.length > 1 ? 1.5 : 0)).toFixed(2) + ' ' + CIRC.toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 60 60)"><title>' + n + ' NT$ ' + fmt(byCat[n]) + '</title></circle>';
+    off += len;
+  }
+  let h = '<div class="chart"><div class="donut"><svg viewBox="0 0 120 120" role="img" aria-label="花費分類圓餅圖"><circle cx="60" cy="60" r="' + R + '" fill="none" stroke="var(--bg)" stroke-width="18"/>' + ring + '<text x="60" y="55" text-anchor="middle" class="dk">總計</text><text x="60" y="72" text-anchor="middle" class="dv">NT$ ' + fmt(total) + '</text></svg></div><ul class="legend2">';
+  for (const [n, c] of cats.sort((a, b) => byCat[b[0]] - byCat[a[0]])) h += '<li><i style="background:' + c + '"></i><span>' + n + '</span><b>' + Math.round(byCat[n] / total * 100) + '%</b><em>NT$ ' + fmt(byCat[n]) + '</em></li>';
+  h += '</ul></div>';
+  const days = [0].concat(DAYS.map(d => d.n)), perDay = {};
+  for (const e of list) { const d = e.day || 0; (perDay[d] = perDay[d] || {}); perDay[d][e.cat] = (perDay[d][e.cat] || 0) + toTWD(e); }
+  const dayTot = d => Object.values(perDay[d] || {}).reduce((a, b) => a + b, 0), mx = Math.max(1, ...days.map(dayTot));
+  const W = 320, H = 130, bw = 20, gap = (W - 24 - bw * days.length) / (days.length - 1);
+  let bars = '';
+  days.forEach((d, i) => {
+    const x = 12 + i * (bw + gap); let y = H - 18;
+    for (const [n, c] of CATS) { const v = (perDay[d] || {})[n]; if (!v) continue; const hh = v / mx * (H - 40); y -= hh; bars += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw + '" height="' + hh.toFixed(1) + '" fill="' + c + '" rx="2"><title>' + (d ? 'Day ' + d : '行前') + ' ' + n + ' NT$ ' + fmt(v) + '</title></rect>'; }
+    const t = dayTot(d); if (t) bars += '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 4).toFixed(1) + '" text-anchor="middle" class="bv">' + (t >= 1000 ? (t / 1000).toFixed(1) + 'k' : fmt(t)) + '</text>';
+    bars += '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 4) + '" text-anchor="middle" class="bl">' + (d ? d : '前') + '</text>';
+  });
+  h += '<div class="daychart"><div class="dch">每天花費（NT$，依類別堆疊）</div><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="每日花費長條圖"><line x1="8" x2="' + (W - 8) + '" y1="' + (H - 18) + '" y2="' + (H - 18) + '" stroke="var(--line)"/>' + bars + '</svg></div>';
+  return h;
+}
 function renderLedger(){
   const sp = document.getElementById('spent'); if (!sp) return;
   const list = L.list;
@@ -828,7 +868,7 @@ function renderLedger(){
   sp.innerHTML = '<div class="spent"><div class="k">TOTAL SPENT</div><div class="cols"><div><small>日幣</small><b>' + fmt(jpy) + ' 円</b></div><div><small>台幣</small><b>NT$ ' + fmt(twd) + '</b></div><div class="sum"><small>總計（台幣）</small><b>NT$ ' + fmt(all) + '</b></div></div><div class="row"><span>每人平均 <b>NT$ ' + fmt(all/3) + '</b></span><span>共 <b>' + list.length + '</b> 筆</span><span>匯率 <b>' + L.rate + '</b></span></div>' + (pend ? '<div class="pend">有 ' + pend + ' 筆等網路恢復後自動上傳</div>' : '') + '</div>';
   const byCat = {}; for (const e of list) byCat[e.cat] = (byCat[e.cat] || 0) + toTWD(e);
   const max = Math.max(1, ...Object.values(byCat));
-  document.getElementById('bars').innerHTML = list.length ? '<div class="bars">' + CATS.filter(([n]) => byCat[n]).map(([n,c]) => '<div class="r"><span>' + n + '</span><span class="t"><i style="width:' + (byCat[n]/max*100).toFixed(1) + '%;background:' + c + '"></i></span><b>NT$ ' + fmt(byCat[n]) + '</b></div>').join('') + '</div>' : '<div class="empty">還沒有記錄，記下第一筆吧</div>';
+  document.getElementById('bars').innerHTML = list.length ? chartHTML(list, byCat) : '<div class="empty">還沒有記錄，記下第一筆吧</div>';
   renderSettle(list);
   const groups = {}; for (const e of list) (groups[e.day] = groups[e.day] || []).push(e);
   const order = Object.keys(groups).map(Number).sort((a,b) => (b||99) - (a||99));
