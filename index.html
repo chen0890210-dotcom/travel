@@ -438,7 +438,6 @@ const ART = {
   twemoji: { name: '簡約', credit: 'Twemoji（CC BY 4.0 授權）', url: k => 'tw-' + k + '.svg' }
 };
 let ARTPREF = 'random';
-try { const v = localStorage.getItem('hk-art2'); if (v === 'random' || ART[v]) ARTPREF = v; } catch (e) {}
 let ARTSTYLE = ARTPREF;
 if (ARTPREF === 'random') {
   let last = null; try { last = localStorage.getItem('hk-art-last'); } catch (e) {}
@@ -480,7 +479,7 @@ function renderNav(cur){
   const d = document.getElementById('drawer'); if (!d) return;
   let h = '<div class="dr-head"><span class="kicker">MY TRIPS</span><button class="dr-close" id="menuClose" type="button" aria-label="關閉選單">×</button></div><nav class="dr-list" aria-label="我的旅程">';
   for (const t of TRIPS) h += '<a href="' + t.href + '"' + (t.views.test(cur) ? ' aria-current="page"' : '') + '><span class="tn">' + t.name + '</span>' + (MENU_ART[t.id] ? MENU_ART[t.id]() : '') + '</a>';
-  h += '</nav><div class="dr-label">插畫風格</div><div class="dr-art-pick" role="group" aria-label="插畫風格"><button type="button" data-art="random" aria-pressed="' + (ARTPREF === 'random') + '"><span class="dice" aria-hidden="true">🎲</span><span>隨機</span></button>' + Object.entries(ART).map(([id, a]) => '<button type="button" data-art="' + id + '" aria-pressed="' + (ARTPREF === id) + '"' + (ARTPREF === 'random' && id === ARTSTYLE ? ' class="now"' : '') + '><img src="' + a.url('snowman', false) + '" alt=""><span>' + a.name + '</span></button>').join('') + '</div><p class="dr-note">' + (ARTPREF === 'random' ? '每次打開隨機換一種，這次是「' + ART[ARTSTYLE].name + '」' : '固定使用「' + ART[ARTSTYLE].name + '」') + '</p>';
+  h += '</nav>';
   d.innerHTML = h;
   document.getElementById('menuClose').addEventListener('click', closeMenu);
   const isH = TRIPS[0].views.test(cur);
@@ -493,7 +492,7 @@ function renderNav(cur){
   tn.querySelectorAll('a').forEach(x => { if (x.getAttribute('href') === '#' + (cur === 'cost' ? 'cost' : cur === 'overview' ? 'overview' : '')) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current'); });
 }
 function renderIshigaki(){
-  let h = '<section class="stagehead" style="--c:var(--blue)"><div class="kicker"><b>NEXT TRIP</b>　下一趟旅程</div><h1>石垣島</h1><div class="route">日期未定・行程規劃中</div></section>';
+  let h = '<section class="stagehead" style="--c:var(--blue)"><div class="kicker"><b>NEXT TRIP</b>　下一趟旅程</div><h1>石垣島</h1><div class="route">2027/02/17（三）– 02/24（三）・8 天 7 夜・行程規劃中</div>' + (() => { const n = Math.round((new Date(2027, 1, 17) - today0()) / 86400000); return n > 0 ? '<div class="count" style="margin-top:12px">距離出發還有 <b>' + n + '</b> 天</div>' : ''; })() + '</section>';
   h += '<div class="isle" role="img" aria-label="石垣島插圖"><img src="' + FE('sun') + '" alt="" class="i-sun"><img src="' + FE('palm') + '" alt="" class="i-palm"><img src="' + FE('beach') + '" alt="" class="i-beach"><img src="' + FE('turtle') + '" alt="" class="i-turtle"><img src="' + FE('fish') + '" alt="" class="i-fish"><img src="' + FE('hibiscus') + '" alt="" class="i-hib"></div>';
   h += '<div class="soon-card"><strong>地圖建置中</strong><p>決定好日期、住宿和想去的地方後告訴我，我就幫這趟做出專屬的地圖、每日行程和記帳本。</p></div>';
   h += '<div class="pager"><a href="#overview">← 冬雪北海道</a></div><div class="spacer"></div>';
@@ -593,8 +592,8 @@ function renderWorld(){
   s += '<path d="' + path + '" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round"/>';
   s += '<path d="' + path + '" fill="none" stroke="var(--ink)" stroke-width="3.2" stroke-dasharray="1 8" stroke-linecap="round"/>';
   for (let i = 0; i <= pts.length; i++) s += '<path id="seg' + i + '" d="' + segD(i) + '" fill="none" stroke="none"/>';
-  s += '<g transform="translate(180 36)"><rect x="-58" y="-16" width="116" height="30" rx="3" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/><text class="sm" x="0" y="4" text-anchor="middle" style="fill:var(--ink);font-weight:700">START｜桃園 ✈</text></g>';
-  s += '<g transform="translate(180 ' + (H-48) + ')"><rect x="-54" y="-16" width="108" height="30" rx="3" fill="var(--ink)"/><text class="sm" x="0" y="4" text-anchor="middle" style="fill:var(--paper);font-weight:700;letter-spacing:.14em">GOAL｜返台</text></g>';
+  s += '<g transform="translate(180 36)"><rect x="-58" y="-16" width="116" height="30" rx="3" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/><text class="sm" x="0" y="4" text-anchor="middle" style="fill:var(--ink);font-weight:700;stroke:none">START｜桃園 ✈</text></g>';
+  s += '<g transform="translate(180 ' + (H-48) + ')"><rect x="-54" y="-16" width="108" height="30" rx="3" fill="var(--ink)"/><text class="sm" x="0" y="4" text-anchor="middle" style="fill:var(--paper);font-weight:700;letter-spacing:.14em;stroke:none">GOAL｜返台</text></g>';
   DAYS.forEach((d,i) => {
     const [x,y] = pts[i], st = state(d), c = C[i], right = x < 180;
     s += '<a href="#day' + d.n + '" aria-label="Day ' + d.n + ' ' + esc(SHORT[i]) + '">';
@@ -691,7 +690,7 @@ function renderOverview(){
     '<li style="--c:var(--rose)"><strong>溫泉旅宿</strong><span>ぽんの湯、紫彩之湯與 Keio Prelia 大浴場，每關結束都能回血。</span></li>' +
     '<li style="--c:var(--mustard)"><strong>道地美食</strong><span>成吉思汗、湯咖哩、味噌拉麵、三角市場海鮮丼與夜聖代。</span></li>' +
     '<li style="--c:var(--plum)"><strong>燈彩人文</strong><span>AOAO 水族館、白色燈樹節、小樽運河與白色戀人點燈。</span></li></ul></details>';
-  h += '<p class="endnote">營業時間依 2026 年查到的資料整理，部分為往年慣例，出發前一週請再到各官網確認。地圖按鈕會開啟 Google 地圖。插圖：' + ART[ARTSTYLE].credit + '。</p><div class="spacer"></div>';
+  h += '<p class="endnote">營業時間依 2026 年查到的資料整理，部分為往年慣例，出發前一週請再到各官網確認。地圖按鈕會開啟 Google 地圖。</p><div class="spacer"></div>';
   return h;
 }
 
