@@ -781,8 +781,8 @@ function setRateLocal(rate, src, ts){
 }
 /* 手動輸入或「自動帶入」：已連線時寫到 Firestore，三支手機一起用同一個匯率 */
 function commitRate(rate, src){
-  if (L.mode === 'db' && L.backend && L.backend.setRate) L.backend.setRate(rate);
   setRateLocal(rate, src);
+  if (L.mode === 'db' && L.backend && L.backend.setRate) L.backend.setRate(rate);
 }
 function applyShared(snap){
   const d = snap.exists() ? snap.data() : null;
@@ -904,7 +904,8 @@ function renderSettle(list){
   box.innerHTML = h;
   const ss = document.getElementById('settlesum'); if (ss) ss.textContent = tr.length ? tr.length + ' 筆待轉帳' : (tot.JPY || tot.TWD) ? '大家打平' : '';
 }
-function writeFailed(){ const m = document.getElementById('msg'); if (m) { m.style.color = ''; m.textContent = '有一筆沒能存到雲端，請檢查網路後再試一次'; } }
+function errHint(err){ const c = err && err.code ? String(err.code).replace(/^firestore\//, '') : ''; return c ? '（' + c + (c === 'permission-denied' ? '：Firestore 規則不允許這次寫入，請確認規則已發布' : '') + '）' : ''; }
+function writeFailed(err){ const m = document.getElementById('msg'); if (m) { m.style.color = ''; m.textContent = '有一筆沒能存到雲端，請檢查網路後再試一次' + errHint(err); } }
 async function addEntry(e){
   if (L.mode === 'db' && L.backend) return L.backend.add(e);
   e.id = 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
@@ -1039,7 +1040,7 @@ async function connectFirebase(){
       add: e => { const ref = fs.doc(col); e.id = ref.id; fs.setDoc(ref, clean(e)).catch(writeFailed); },
       set: (id, e) => { e.id = id; fs.setDoc(fs.doc(col, id), clean(e)).catch(writeFailed); },
       del: id => { fs.deleteDoc(fs.doc(col, id)).catch(writeFailed); },
-      setRate: r => { fs.setDoc(rateRef, { rate: r, ts: Date.now() }).catch(() => { const n = document.getElementById('ratenote'); if (n) n.textContent = '匯率沒能存到雲端，目前只套用在這支手機'; }); }
+      setRate: r => { fs.setDoc(rateRef, { rate: r, ts: Date.now() }).catch(err => { const n = document.getElementById('ratenote'); if (n) n.textContent = '匯率沒能存到雲端，目前只套用在這支手機' + errHint(err); }); }
     };
     fs.onSnapshot(rateRef, applyShared, () => {});
     fs.onSnapshot(col, { includeMetadataChanges: true }, snap => {
