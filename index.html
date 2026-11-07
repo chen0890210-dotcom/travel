@@ -845,18 +845,6 @@ function chartHTML(list, byCat){
   let h = '<div class="chart"><div class="donut"><svg viewBox="0 0 120 120" role="img" aria-label="花費分類圓餅圖"><circle cx="60" cy="60" r="' + R + '" fill="none" stroke="var(--bg)" stroke-width="18"/>' + ring + '<text x="60" y="55" text-anchor="middle" class="dk">總計</text><text x="60" y="72" text-anchor="middle" class="dv">NT$ ' + fmt(total) + '</text></svg></div><ul class="legend2">';
   for (const [n, c] of cats.sort((a, b) => byCat[b[0]] - byCat[a[0]])) h += '<li><i style="background:' + c + '"></i><span>' + n + '</span><b>' + Math.round(byCat[n] / total * 100) + '%</b><em>NT$ ' + fmt(byCat[n]) + '</em></li>';
   h += '</ul></div>';
-  const days = [0].concat(DAYS.map(d => d.n)), perDay = {};
-  for (const e of list) { const d = e.day || 0; (perDay[d] = perDay[d] || {}); perDay[d][e.cat] = (perDay[d][e.cat] || 0) + toTWD(e); }
-  const dayTot = d => Object.values(perDay[d] || {}).reduce((a, b) => a + b, 0), mx = Math.max(1, ...days.map(dayTot));
-  const W = 320, H = 130, bw = 20, gap = (W - 24 - bw * days.length) / (days.length - 1);
-  let bars = '';
-  days.forEach((d, i) => {
-    const x = 12 + i * (bw + gap); let y = H - 18;
-    for (const [n, c] of CATS) { const v = (perDay[d] || {})[n]; if (!v) continue; const hh = v / mx * (H - 40); y -= hh; bars += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw + '" height="' + hh.toFixed(1) + '" fill="' + c + '" rx="2"><title>' + (d ? 'Day ' + d : '行前') + ' ' + n + ' NT$ ' + fmt(v) + '</title></rect>'; }
-    const t = dayTot(d); if (t) bars += '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 4).toFixed(1) + '" text-anchor="middle" class="bv">' + (t >= 1000 ? (t / 1000).toFixed(1) + 'k' : fmt(t)) + '</text>';
-    bars += '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 4) + '" text-anchor="middle" class="bl">' + (d ? d : '前') + '</text>';
-  });
-  h += '<div class="daychart"><div class="dch">每天花費（NT$，依類別堆疊）</div><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="每日花費長條圖"><line x1="8" x2="' + (W - 8) + '" y1="' + (H - 18) + '" y2="' + (H - 18) + '" stroke="var(--line)"/>' + bars + '</svg></div>';
   return h;
 }
 function renderLedger(){
