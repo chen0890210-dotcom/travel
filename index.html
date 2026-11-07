@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ECE7DD">
 <meta name="color-scheme" content="light only">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="旅遊">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -15,9 +16,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=LXGW+WenKai+TC:wght@400;700&display=swap">
 <style>
 :root{
-  --bg:#ECE7DD; --paper:#F7F3EC; --ink:#393833; --muted:#7A766C; --line:#CDC4B4; --dot:#D6CEC0;
+  --bg:#ECE7DD; --paper:#F7F3EC; --ink:#393833; --muted:#68645A; --line:#CDC4B4; --dot:#D6CEC0;
   --blue:#6E8FA6; --sage:#87A07F; --rose:#C48A80; --mustard:#C39B4F; --plum:#9B8AA6;
   --sea:#DCE3E2; --land:#E6DFD0;
+  --rose-t:color-mix(in srgb,var(--rose) 60%,#000); --sage-t:color-mix(in srgb,var(--sage) 60%,#000); --mustard-t:color-mix(in srgb,var(--mustard) 60%,#000);
   --text:'LXGW WenKai TC','PingFang TC','Microsoft JhengHei',serif;
   --type:'Courier Prime','Courier New',monospace;
   color-scheme:light; box-sizing:border-box;
@@ -56,7 +58,7 @@ a{color:inherit} button{font:inherit;color:inherit}
 .intro h1{margin:4px 0 0;font-size:34px;letter-spacing:.1em;font-weight:700;line-height:1.3}
 .intro p{margin:6px 0 0;color:var(--muted);font-size:15px}
 .count{margin-top:14px;display:inline-flex;align-items:baseline;gap:8px;border:1px dashed var(--ink);border-radius:4px;padding:4px 14px;font-size:15px}
-.count b{font-family:var(--type);font-size:26px;color:var(--rose)}
+.count b{font-family:var(--type);font-size:26px;color:var(--rose-t)}
 .world{margin:12px 8px 0;position:relative}
 .world svg{width:100%;height:auto;display:block;overflow:visible}
 .world a{cursor:pointer}
@@ -68,7 +70,7 @@ a{color:inherit} button{font:inherit;color:inherit}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:4px 20px 0;font-size:13px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend .crew{gap:4px;color:var(--ink)}
-.playbtn{margin-left:auto;border:1px solid var(--ink);background:var(--paper);border-radius:999px;padding:3px 12px;font:inherit;font-size:13px;cursor:pointer;min-height:32px}
+.playbtn{margin-left:auto;border:1px solid var(--ink);background:var(--paper);border-radius:999px;padding:3px 10px;min-width:36px;font:inherit;font-size:13px;cursor:pointer;min-height:32px}
 .playbtn:disabled{opacity:.5}
 .legend i{width:14px;height:14px;border-radius:50%;display:inline-block;border:1.5px solid var(--ink)}
 h2{font-size:18px;font-weight:400;letter-spacing:.12em;margin:30px 20px 10px;display:flex;align-items:center;gap:10px}
@@ -81,11 +83,12 @@ h2::after{content:"";flex:1;border-top:1px dashed var(--line)}
 
 /* stage */
 .stagehead{padding:20px 20px 6px}
-.stagehead .kicker b{color:var(--c);font-weight:700}
+.stagehead .kicker b{color:color-mix(in srgb,var(--c) 60%,#000);font-weight:700}
 .stagehead h1{margin:4px 0 0;font-size:24px;line-height:1.45;font-weight:700;letter-spacing:.04em}
 .stagehead .route{margin-top:6px;font-size:14.5px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .pips{display:flex;gap:5px;margin-top:12px}
-.pips a{width:22px;height:6px;border-radius:3px;background:var(--line)}
+.pips a{width:22px;height:6px;border-radius:3px;background:var(--line);position:relative}
+.pips a::before{content:"";position:absolute;inset:-14px -2px}
 .pips a.past{background:var(--muted)}
 .pips a.cur{background:var(--c)}
 .trail{list-style:none;margin:14px 0 0;padding:0 18px 0 18px;position:relative}
@@ -93,7 +96,7 @@ h2::after{content:"";flex:1;border-top:1px dashed var(--line)}
 .cp{position:relative;padding-left:52px;margin:0 0 14px}
 .cp .pin{position:absolute;left:4px;top:8px;width:32px;height:32px;border-radius:50%;background:var(--paper);border:2px solid var(--c);display:grid;place-items:center;color:var(--c)}
 .cp .card{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:12px 14px 12px}
-.tag{display:inline-block;font-family:var(--type);font-size:11px;letter-spacing:.14em;color:var(--c);border-bottom:1px solid var(--c);line-height:1.5}
+.tag{display:inline-block;font-family:var(--type);font-size:11px;letter-spacing:.14em;color:color-mix(in srgb,var(--c) 60%,#000);border-bottom:1px solid var(--c);line-height:1.5}
 .cp h3{margin:4px 0 0;font-size:17px;line-height:1.5;font-weight:700}
 .hours{display:inline-block;margin-top:6px;font-size:12.5px;color:var(--ink);background:color-mix(in srgb,var(--mustard) 22%,transparent);border-radius:2px;padding:0 8px;line-height:1.8}
 .cp p{margin:6px 0 0;font-size:15px}
@@ -115,7 +118,7 @@ h2::after{content:"";flex:1;border-top:1px dashed var(--line)}
 .save .v{flex:1}
 .save .v small{display:block;font-size:12.5px;color:var(--muted)}
 .hint{background:transparent;border:1px dashed var(--rose);margin-bottom:12px}
-.hint .badge{border:1px solid var(--rose);color:var(--rose)}
+.hint .badge{border:1px solid var(--rose);color:var(--rose-t)}
 .pager{display:flex;justify-content:space-between;gap:12px;padding:20px 18px 8px}
 .pager a{text-decoration:none;font-family:var(--type);font-size:14px;letter-spacing:.06em;border:1px solid var(--ink);border-radius:3px;padding:6px 14px;background:var(--paper)}
 .goal{font-family:var(--type)}
@@ -147,9 +150,9 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .sync{margin:6px 20px 0;font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .sync i{width:8px;height:8px;border-radius:50%;background:var(--line);display:inline-block}
 .sync.live i{background:var(--sage)}
+.sync.wait i{background:var(--mustard)}
 .spent{margin:12px 18px 0;padding:14px 16px;background:var(--paper);border:2px solid var(--ink);border-radius:4px}
 .spent .k{font-family:var(--type);font-size:11px;letter-spacing:.16em;color:var(--muted)}
-.spent .big{font-family:var(--type);font-size:30px;font-weight:700;line-height:1.25}
 .spent .row{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13.5px;color:var(--muted);margin-top:4px}
 .spent .row b{font-family:var(--type);color:var(--ink);font-weight:700}
 .addform{margin:12px 18px 0;padding:14px 16px;background:var(--paper);border:1px solid var(--line);border-radius:4px;display:grid;gap:10px}
@@ -163,11 +166,10 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:4px 12px;font-size:14px;cursor:pointer;min-height:34px}
-.chips button[aria-pressed="true"]{border-color:var(--c);background:var(--c);color:#fff}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips button[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 28%,var(--paper));box-shadow:inset 0 0 0 1px var(--c);color:var(--ink)}
 .addbtn{border:0;background:var(--ink);color:var(--paper);border-radius:4px;padding:10px;font-size:16px;letter-spacing:.2em;cursor:pointer;min-height:46px}
 .addbtn:disabled{opacity:.45;cursor:default}
-.msg{font-size:13px;color:var(--rose);min-height:1em}
+.msg{font-size:13px;color:var(--rose-t);min-height:1em}
 .bars{margin:0 18px;padding:10px 16px;background:var(--paper);border:1px solid var(--line);border-radius:4px}
 .bars .r{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:10px;align-items:center;padding:5px 0;font-size:14px}
 .bars .t{height:8px;border-radius:4px;background:var(--bg);overflow:hidden}
@@ -176,32 +178,24 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .empty{margin:0 18px;padding:18px;border:1px dashed var(--line);border-radius:4px;text-align:center;color:var(--muted);font-size:14.5px}
 .ledger{margin:0 18px;padding:0;list-style:none}
 .ledger .dh{font-family:var(--type);font-size:12px;letter-spacing:.14em;color:var(--muted);margin:14px 0 6px;display:flex;justify-content:space-between}
-.ledger .e{display:grid;grid-template-columns:10px minmax(0,1fr) auto 32px;gap:10px;align-items:center;padding:9px 12px;background:var(--paper);border:1px solid var(--line);border-radius:4px;margin-bottom:6px}
+.ledger .e{display:grid;grid-template-columns:10px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 12px;background:var(--paper);border:1px solid var(--line);border-radius:4px;margin-bottom:6px}
 .ledger .dot{width:10px;height:10px;border-radius:50%}
 .ledger .nm{font-size:15px;line-height:1.4}
 .ledger .nm small{display:block;font-size:12px;color:var(--muted)}
 .ledger .am{font-family:var(--type);font-weight:700;text-align:right;white-space:nowrap;font-size:15px}
 .ledger .am small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
 .del{border:0;background:transparent;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;width:32px;height:32px;border-radius:4px}
-.del:hover{background:var(--bg);color:var(--rose)}
-.ledger .e{grid-template-columns:10px minmax(0,1fr) auto auto}
+.del:hover{background:var(--bg);color:var(--rose-t)}
 .del.armed{width:auto;padding:0 10px;font-size:13px;background:var(--rose);color:#fff}
-.who-tbl{margin:0 18px;padding:4px 16px;background:var(--paper);border:1px solid var(--line);border-radius:4px}
-.who-tbl .r{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 14px;align-items:baseline;padding:8px 0;border-top:1px dashed var(--line);font-size:14px}
-.who-tbl .r:first-child{border-top:0;color:var(--muted);font-size:12px}
-.who-tbl .r b{font-family:var(--type);font-weight:700;text-align:right;white-space:nowrap}
-.who-tbl .r span:not(:first-child){font-family:var(--type);text-align:right;white-space:nowrap}
-.who-tbl .p{display:inline-flex;align-items:center;gap:6px}
-.who-tbl .p i{width:10px;height:10px;border-radius:50%;display:inline-block}
-.pos{color:var(--sage)} .neg{color:var(--rose)}
+.pos{color:var(--sage-t)} .neg{color:var(--rose-t)}
 .xfer{margin:10px 18px 0;display:flex;flex-direction:column;gap:8px}
 .xfer div{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--paper);border:2px solid var(--ink);border-radius:4px;font-size:16px}
 .xfer .arrow{font-family:var(--type);color:var(--muted)}
 .xfer .amt{margin-left:auto;text-align:right;font-family:var(--type);font-weight:700}
 .xfer .amt small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
-.even{margin:10px 18px 0;padding:12px 14px;border:1px dashed var(--sage);border-radius:4px;color:var(--sage);font-size:15px}
+.even{margin:10px 18px 0;padding:12px 14px;border:1px dashed var(--sage);border-radius:4px;color:var(--sage-t);font-size:15px}
 .skip{margin:8px 20px 0;font-size:12.5px;color:var(--muted)}
-.rate{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 20px 0;font-size:13.5px;color:var(--muted)}
+.rate{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 20px 10px;font-size:13.5px;color:var(--muted)}
 .rate input{width:84px;font-family:var(--type);font-size:15px;border:1px solid var(--line);border-radius:4px;padding:4px 8px;background:var(--paper);color:var(--ink)}
 /* menu */
 .burger{width:40px;height:40px;margin-left:-8px;border:0;background:transparent;border-radius:4px;display:grid;place-content:center;gap:4px;cursor:pointer;flex:none}
@@ -215,32 +209,9 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 @media (prefers-reduced-motion:reduce){ .drawer,.scrim{transition:none} }
 .dr-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .dr-close{width:40px;height:40px;border:0;background:transparent;font-size:26px;line-height:1;color:var(--muted);cursor:pointer;border-radius:4px}
-.dr-trip{background:var(--paper);border:2px solid var(--ink);border-radius:4px;padding:12px 14px}
-.dr-trip strong{display:block;font-size:20px;letter-spacing:.08em;margin-top:2px}
-.dr-trip small{font-size:12.5px;color:var(--muted)}
-.dr-sec{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-.dr-sec a{display:flex;align-items:baseline;justify-content:space-between;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:10px 14px;font-size:16px}
-.dr-sec a small{font-family:var(--type);font-size:11px;letter-spacing:.14em;color:var(--muted)}
-.dr-sec a[aria-current="page"]{border-color:var(--ink);box-shadow:inset 3px 0 0 var(--ink)}
-.dr-label{font-size:13px;letter-spacing:.2em;color:var(--muted);margin:20px 2px 8px}
-.dr-days{display:flex;flex-direction:column}
-.dr-days a{display:grid;grid-template-columns:38px minmax(0,1fr);gap:10px;align-items:center;text-decoration:none;padding:7px 6px;border-radius:4px;border-top:1px dashed var(--line)}
-.dr-days a:first-child{border-top:0}
-.dr-days a b{font-family:var(--type);font-size:15px;font-weight:700;color:var(--c)}
-.dr-days a span{font-size:14.5px;line-height:1.4}
-.dr-days a small{display:block;font-family:var(--type);font-size:11px;color:var(--muted)}
-.dr-days a[aria-current="page"]{background:var(--paper)}
-.dr-days a.now b::after{content:" ●";font-size:9px;vertical-align:2px}
-.dr-trips{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-.dr-trips li{padding:10px 14px;border:1px solid var(--line);border-radius:4px;background:var(--paper)}
-.dr-trips li.on{border-color:var(--ink)}
-.dr-trips li.soon{background:transparent;border-style:dashed;color:var(--muted)}
-.dr-trips strong{display:block;font-size:15px;font-weight:400}
-.dr-trips small{font-size:12px;color:var(--muted)}
 .dr-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
 .dr-list a{display:block;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:14px 16px;font-size:18px;letter-spacing:.1em}
 .dr-list a[aria-current="page"]{border:2px solid var(--ink);padding:13px 15px}
-.bar-top .nav{margin-left:auto}
 .bar-top .nav + .today{margin-left:0}
 .bar-top [hidden]{display:none}
 .isle{margin:6px 18px 0;background:var(--paper);border:1px solid var(--line);border-radius:4px;overflow:hidden}
@@ -248,7 +219,6 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .soon-card{margin:12px 18px 0;padding:14px 16px;border:1px dashed var(--ink);border-radius:4px}
 .soon-card strong{font-size:16px}
 .soon-card p{margin:4px 0 0;font-size:14.5px;color:var(--muted)}
-.who-tbl .r{grid-template-columns:minmax(0,1fr) auto auto auto}
 .editbar{display:flex;justify-content:space-between;align-items:center;gap:8px;background:color-mix(in srgb,var(--mustard) 22%,transparent);border-radius:4px;padding:6px 10px;font-size:14px}
 .editbar[hidden]{display:none}
 .editbar button{border:1px solid var(--ink);background:var(--paper);border-radius:999px;padding:2px 12px;font:inherit;font-size:13px;cursor:pointer;min-height:30px}
@@ -256,8 +226,8 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .addform label small{color:var(--muted);margin-left:4px;font-size:11.5px}
 .ledger .nm{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;color:inherit;min-width:0}
 .ledger .e.on{border-color:var(--mustard);box-shadow:inset 3px 0 0 var(--mustard)}
-.ledger .nm em{font-style:normal;color:var(--mustard)}
-.pend{margin-top:6px;font-size:12.5px;color:var(--mustard)}
+.ledger .nm em{font-style:normal;color:var(--mustard-t)}
+.pend{margin-top:6px;font-size:12.5px;color:var(--mustard-t)}
 .spent .cols{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:6px}
 .spent .cols div{display:flex;flex-direction:column}
 .spent .cols small{font-size:12px;color:var(--muted)}
@@ -275,7 +245,6 @@ tr.sum td{border-top:1px solid var(--ink);font-weight:700}
 .stl .p{display:inline-flex;align-items:center;gap:6px}
 .stl .p i{width:10px;height:10px;border-radius:50%;display:inline-block}
 .stlnote{margin:6px 20px 0;font-size:12px;color:var(--muted)}
-.rate{margin:0 20px 10px}
 .ratebtn{border:1px solid var(--ink);background:var(--paper);border-radius:999px;padding:3px 12px;font:inherit;font-size:13px;cursor:pointer;min-height:32px}
 .ratenote{width:100%;font-size:12px;color:var(--muted)}
 .h2note{font-size:12px;color:var(--muted);letter-spacing:0;font-weight:400}
@@ -310,8 +279,8 @@ body[data-trip="ishigaki"]{--bg:#E6ECE8;background-color:var(--bg)}
 .sh{display:flex;flex-direction:column;gap:3px;margin:0}
 .sh span{font-size:13px;color:var(--ink)}
 .sh input{font-family:var(--type);font-size:16px;padding:7px 8px}
-.shnote{grid-column:1/-1;font-size:12.5px;color:var(--rose)}
-.shnote.ok{color:var(--sage)}
+.shnote{grid-column:1/-1;font-size:12.5px;color:var(--rose-t)}
+.shnote.ok{color:var(--sage-t)}
 .cp.move .card,.soon-card,.hint,.count{background:rgba(247,243,236,.86)}
 .bgart{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
 .bgart img{position:absolute;opacity:.26;object-fit:contain}
@@ -365,7 +334,6 @@ body[data-trip="ishigaki"] .bgart img{opacity:.3}
 .fold[open] summary::after{content:"－"}
 .hlfold .hl{margin:0 10px 12px;gap:8px}
 .hlfold .hl li{padding:10px 12px}
-.playbtn{min-width:36px;padding:3px 10px}
 .fold summary small{font-size:12px;color:var(--muted);letter-spacing:0}
 .fold .cap{margin:4px 14px 6px;font-size:13px}
 .fold .sheet{margin:0 10px;padding:2px 12px}
@@ -390,14 +358,13 @@ body[data-trip="ishigaki"] .bgart img{opacity:.3}
 </div></header>
 <div class="bgart" id="bgart" aria-hidden="true"></div>
 <div class="scrim" id="scrim" hidden></div>
-<aside class="drawer" id="drawer" aria-label="選單" hidden></aside>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="選單" hidden></aside>
 <main class="wrap view" id="view"></main>
 <script>
-const DAYS = [{"n": 1, "date": "2026-11-24", "sub": "札幌", "title": "抵達北海道・雪具採買・烤肉與 moyuk 扭蛋", "items": [{"t": true, "when": "06:15–10:55", "title": "航班移動", "hours": null, "body": "台灣虎航 IT234 桃園起飛，10:55 抵達新千歲機場國際線，入境提領行李。", "maps": []}, {"t": true, "when": "12:00–12:50", "title": "前往札幌市區", "hours": null, "body": "JR 快速 Airport 號至札幌站（約 37 分），轉地鐵南北線 1 站至大通站，或計程車約 5 分鐘。", "maps": [{"label": "路線", "o": "新千歳空港駅", "d": "大通駅"}]}, {"t": false, "when": "住宿", "title": "飯店辦理手續", "hours": null, "body": "抵達 La’gent Stay 札幌大通，辦理入住，大行李寄存櫃檯。", "maps": [{"label": "地圖", "q": "La'gent Stay Sapporo Odori"}]}, {"t": false, "when": "午餐", "title": "狸小路午餐", "hours": null, "body": "飯店對面狸小路 5 丁目周邊熱食，如 Suage+ 湯咖哩或在地拉麵。", "maps": [{"label": "地圖", "q": "狸小路5丁目 札幌"}]}, {"t": false, "when": "購物", "title": "二手雪具採買・兩階段策略", "hours": null, "body": "① 徒步圈：2nd STREET 狸小路 4 丁目店（雪靴／配件・10:00–21:00）→ Murasaki Sports 札幌 PARCO 4F（中古板、雪鞋試穿與角度調校・10:00–20:00）→ MOJANE（單板專門店）。買齊直接手提 3–5 分鐘回房。<br>② 備案：薄野搭定鐵巴士約 25 分鐘至 2nd OUTDOOR 川沿店 ＋ BOOKOFF PLUS 川沿店；買完合叫休旅計程車回飯店（約 20 分，約 3,000 円）。", "maps": [{"label": "2nd STREET", "q": "セカンドストリート 狸小路4丁目店"}, {"label": "Murasaki", "q": "ムラサキスポーツ 札幌パルコ"}, {"label": "MOJANE", "q": "MOJANE 札幌"}, {"label": "2nd OUTDOOR", "q": "2nd OUTDOOR 札幌川沿店"}]}, {"t": false, "when": "休整", "title": "返回飯店休整", "hours": null, "body": "雪板、雪鞋送入房間放置。", "maps": []}, {"t": false, "when": "晚餐", "title": "晚餐｜成吉思汗 いただきます。", "hours": "16:00–23:00", "body": "南 5 條西 5 丁目，步行約 5 分鐘。自營牧場純種薩福克生羊肉與內臟拼盤，鮮甜無羶。", "maps": [{"label": "地圖", "q": "ジンギスカン 羊飼いの店 いただきます。 札幌"}]}, {"t": false, "when": "扭蛋", "title": "扭蛋店 1｜ガチャガチャの森 moyukSAPPORO", "hours": "～20:00", "body": "moyuk SAPPORO 3F，森林風扭蛋牆、最新正版 IP 與生活模型。", "maps": [{"label": "地圖", "q": "ガチャガチャの森 moyukSAPPORO"}]}, {"t": false, "when": "購物", "title": "超市採買與裝備整頓", "hours": "唐吉訶德 24 小時", "body": "狸小路唐吉訶德採買高熱量零食、能量凍與早餐；回房將裝備裝袋。", "maps": [{"label": "地圖", "q": "ドン・キホーテ 札幌狸小路本店"}]}, {"t": false, "when": "溫泉", "title": "泡湯休整", "hours": null, "body": "館內 3F 天然地底溫泉「ぽんの湯」。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 2, "date": "2026-11-25", "sub": "滑雪 Day 1", "title": "札幌國際滑雪場・雪具寄放・AOAO 水族館", "items": [{"t": false, "when": "出發", "title": "晨間整頓・步行出發", "hours": null, "body": "換穿雪服，攜雪板袋、雪靴袋與隨身包，步行 3 分鐘至對面札幌東急 REI 酒店正門。", "maps": [{"label": "地圖", "q": "札幌東急REIホテル"}]}, {"t": true, "when": "08:50–10:20", "title": "專車上山", "hours": null, "body": "定鐵巴士預約專車，雪板放車底行李艙，直達滑雪中心。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "購票與更衣", "hours": null, "body": "領取纜車票，更衣室換雪靴，便鞋鎖進置物櫃。", "maps": []}, {"t": false, "when": "滑雪", "title": "暢滑雪道", "hours": "平日 9:00–17:00", "body": "札幌國際滑雪場。適應新板腳感，暢滑天然粉雪；午餐於雪場 2F 餐廳。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "雪具過夜寄存", "hours": null, "body": "換回便鞋，3 套雪板與雪靴送至滑雪中心 B1F Cloak 人工寄存處（每件約 300–500 円／晚）。", "maps": []}, {"t": true, "when": "16:00–17:30", "title": "專車返回市區", "hours": null, "body": "雙手空空搭 16:00 巴士回東急 REI，步行回飯店換保暖便服。", "maps": []}, {"t": false, "when": "晚餐", "title": "晚餐｜湯咖哩二選一", "hours": null, "body": "<b>首選 Soup Curry TREASURE</b>（南 2 條西 1 丁目，步行約 4 分）：和風海鮮高湯，39 席、營業 11:30–22:30，3 人好入座。<b>備案 SOUP CURRY KING セントラル</b>（南 2 條西 3 丁目 B1）：豚骨雞骨＋和風雙湯頭的超人氣名店，座位少常排隊，離 AOAO 最近。", "maps": [{"label": "TREASURE", "q": "スープカレー TREASURE 札幌"}, {"label": "KING", "q": "SOUP CURRY KING セントラル 札幌"}]}, {"t": false, "when": "景點", "title": "AOAO SAPPORO 都市水族館", "hours": "10:00–22:00・最後入館 21:00", "body": "moyuk SAPPORO 4–6F。避開風雪，看跳岩企鵝、發光水母與沉浸式光影海洋展。", "maps": [{"label": "地圖", "q": "AOAO SAPPORO"}]}, {"t": false, "when": "扭蛋", "title": "扭蛋店 2｜#C-pla 狸小路 5 丁目店", "hours": "10:00–22:00", "body": "800–1,000 台扭蛋機，動漫、搞怪小物與懷舊系列。", "maps": [{"label": "地圖", "q": "#C-pla 狸小路5丁目店"}]}, {"t": false, "when": "溫泉", "title": "溫泉舒緩", "hours": null, "body": "步行 1 分鐘回房，「ぽんの湯」舒緩大腿肌肉。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 3, "date": "2026-11-26", "sub": "滑雪 Day 2", "title": "味噌拉麵・Nikka 爺爺・PARCO 扭蛋・白色燈樹節", "items": [{"t": false, "when": "出發", "title": "輕裝出發", "hours": null, "body": "房內早餐，只背隨身小包（雪鏡、手套），步行 3 分鐘至東急 REI 前搭車。", "maps": [{"label": "地圖", "q": "札幌東急REIホテル"}]}, {"t": true, "when": "08:50–10:40", "title": "專車上山・領雪具", "hours": null, "body": "雙手空空搭專車，至 B1F Cloak 憑牌領出雪板與雪靴。", "maps": []}, {"t": false, "when": "滑雪", "title": "暢滑雪道", "hours": "平日 9:00–17:00", "body": "札幌國際滑雪場全天粉雪；中午雪場餐廳用餐。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "再次過夜寄存", "hours": null, "body": "換回便鞋，雪具交回 B1F Cloak，隔天滑完再領。", "maps": []}, {"t": true, "when": "16:00–18:15", "title": "回市區・換裝整備", "hours": null, "body": "16:00 巴士約 17:15–17:30 抵東急 REI；回飯店換保暖便服、防寒大衣與防滑便鞋。", "maps": []}, {"t": false, "when": "晚餐", "title": "晚餐｜麵屋 雪風 薄野本店", "hours": "18:00–翌 3:00", "body": "南 7 條西 4 丁目，步行約 6 分鐘。晚餐時段早點到可避開續攤與深夜長隊；三種味噌調配的濃郁熱湯，配炙燒叉燒與溏心蛋，迅速補足體力。", "maps": [{"label": "地圖", "q": "麺屋 雪風 すすきの"}]}, {"t": false, "when": "景點", "title": "Nikka Whisky Sign", "hours": "夜間點燈", "body": "往北 2 個街區至薄野十字路口，在彩色霓虹「威士忌爺爺」下合影，感受不夜城。", "maps": [{"label": "地圖", "q": "ニッカウヰスキー 看板 すすきの交差点"}]}, {"t": false, "when": "購物", "title": "札幌 PARCO｜CASETiFY ＆ #C-pla", "hours": "PARCO 10:00–20:00", "body": "沿站前通北行約 3 分鐘。1F CASETiFY STUDIO 挑北海道限定或聯名手機殼，再上 7F #C-pla 快速轉限定扭蛋。", "maps": [{"label": "地圖", "q": "札幌PARCO"}]}, {"t": false, "when": "景點", "title": "大通公園・白色燈樹節＆耶誕市集", "hours": "燈飾約 16:30–22:00・市集至 21:00", "body": "步行 2 分鐘。白雪光雕與橘紅暖光的札幌電視塔；1–2 丁目慕尼黑耶誕市集（最後點餐 20:45）品嚐德國美食、熱紅酒，挑雪花球與耶誕雜貨。", "maps": [{"label": "地圖", "q": "大通公園 西2丁目 札幌"}]}, {"t": false, "when": "溫泉", "title": "漫步回房・泡湯", "hours": null, "body": "步行 3–4 分鐘返回飯店，「ぽんの湯」舒緩全身。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 4, "date": "2026-11-27", "sub": "滑雪 Day 3", "title": "札幌國際收官・雪具載回・夜聖代・薄野漫步", "items": [{"t": true, "when": "07:30–10:40", "title": "出發・上山・領雪具", "hours": null, "body": "輕裝步行至東急 REI 前，08:50 專車直達滑雪中心，至 B1F Cloak 憑牌領出裝備。", "maps": [{"label": "地圖", "q": "札幌東急REIホテル"}]}, {"t": false, "when": "滑雪", "title": "札幌國際最後一天", "hours": "平日 9:00–17:00", "body": "盡情享受粉雪；中午雪場餐廳用餐。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "領回全部雪具並裝袋", "hours": null, "body": "領出 3 人雪板與雪靴，完整裝入雪板袋封妥，準備隨車載回。", "maps": []}, {"t": true, "when": "16:00–17:30", "title": "專車載運裝備回市區", "hours": null, "body": "雪板袋放行李艙，抵東急 REI 後提著裝備步行 3 分鐘回房。", "maps": []}, {"t": false, "when": "休整", "title": "飯店休整換裝", "hours": null, "body": "換穿輕鬆保暖便服。", "maps": []}, {"t": false, "when": "晚餐", "title": "悠閒晚餐", "hours": null, "body": "薄野／狸小路隨性小品：在地居酒屋小食、烤鳥串或熱湯定食。", "maps": []}, {"t": false, "when": "甜點", "title": "結尾夜聖代（シメパフェ）｜Parfaiteria Pal", "hours": "週五 18:00–翌 2:00", "body": "南 4 條西 2 丁目 10-1 6F，步行約 3 分鐘。生乳霜淇淋、酸甜雪酪與時令水果雕琢的藝術聖代。", "maps": [{"label": "地圖", "q": "パフェテリア パル 札幌"}]}, {"t": false, "when": "散策", "title": "薄野至狸小路夜遊", "hours": "唐吉訶德 24 小時", "body": "沿薄野中央通穿梭至狸小路拱廊，逛特色小店、藥妝或唐吉訶德，看覆雪街道霓虹。", "maps": [{"label": "地圖", "q": "狸小路商店街"}]}, {"t": false, "when": "溫泉", "title": "最後一晚ぽんの湯", "hours": null, "body": "行李隔天退房前順手整理裝箱即可。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 5, "date": "2026-11-28", "sub": "札幌 → 富良野", "title": "雙神社地鐵巡禮・高速大巴轉場新富良野", "items": [{"t": true, "when": "08:30–09:00", "title": "退房・裝備轉移寄放", "hours": null, "body": "大通飯店退房，計程車將大裝備送往 JR 札幌站北口寄放。", "maps": [{"label": "地圖", "q": "JR札幌駅 北口"}]}, {"t": false, "when": "景點", "title": "北海道神宮", "hours": "開放 11 月 7:00–16:00", "body": "地鐵至圓山公園站，悠閒參拜，於六花亭神宮茶屋享用現烤判官餅。", "maps": [{"label": "地圖", "q": "北海道神宮"}]}, {"t": true, "when": "10:45–11:20", "title": "神社間大眾運輸動線", "hours": null, "body": "北海道神宮 → 札幌諏訪神社，合併計費僅 250 円／人<ol class=\"steps\"><li>步行 10–12 分：穿過「公園口鳥居」至圓山公園站 3 號入口</li><li>東西線約 5 分：圓山公園 → 大通（往新札幌，3 站），依藍色東豐線指標前進</li><li>站內轉乘 4–5 分：地下連通道至東豐線月台（往榮町）</li><li>東豐線約 5 分：大通 → 北 13 條東（3 站）</li><li>步行約 3 分：2 號出口直走抵諏訪神社正門</li></ol>", "maps": [{"label": "路線", "o": "北海道神宮", "d": "札幌諏訪神社"}]}, {"t": false, "when": "景點", "title": "札幌諏訪神社", "hours": "參拜自由", "body": "季節鮮花手水，求取特色御朱印。", "maps": [{"label": "地圖", "q": "札幌諏訪神社"}]}, {"t": false, "when": "午餐", "title": "漫步回札幌站北口・午餐", "hours": null, "body": "往西南步行約 10–12 分鐘。", "maps": [{"label": "地圖", "q": "JR札幌駅 北口"}]}, {"t": false, "when": "購物", "title": "車上點心・提領裝備", "hours": "大丸 10:00–20:00", "body": "站前シマエナガ Creperie 買雪之妖精造型甜點當車上點心（或大丸 B1 外帶），領回雪具與大行李。", "maps": [{"label": "地圖", "q": "大丸札幌店"}]}, {"t": true, "when": "14:25–14:50", "title": "札幌站前 2 號站牌", "hours": null, "body": "排隊搭乘 14:50 發車的高速富良野號。", "maps": [{"label": "地圖", "q": "札幌駅前 高速ふらの号 のりば"}]}, {"t": true, "when": "14:50–17:22", "title": "高速富良野號", "hours": null, "body": "一路前往富良野，17:22 抵達 JR 富良野站前。", "maps": [{"label": "路線", "o": "札幌駅前", "d": "富良野駅"}]}, {"t": true, "when": "17:22–17:48", "title": "轉乘快速薰衣草號", "hours": null, "body": "站前公車乘車處轉乘富良野巴士「快速薰衣草號」（或西達布線），17:30 發車，17:48 直達新富良野王子大飯店。", "maps": [{"label": "路線", "o": "富良野駅", "d": "新富良野プリンスホテル"}]}, {"t": false, "when": "住宿", "title": "入住・百匯晚餐・泡湯", "hours": null, "body": "行李送入房間，享用飯店豐盛百匯晚餐，泡湯放鬆。", "maps": [{"label": "地圖", "q": "新富良野プリンスホテル"}]}], "stay": "新富良野王子大飯店", "stayq": "新富良野プリンスホテル", "note": null}, {"n": 6, "date": "2026-11-29", "sub": "富良野滑雪首日", "title": "Furano Zone 暢滑", "items": [{"t": false, "when": "早餐", "title": "晨間整裝", "hours": null, "body": "挑高雪景自助百匯早餐，1F 取出雪板。", "maps": []}, {"t": false, "when": "滑雪", "title": "富良野全日暢滑", "hours": "8:30–16:00", "body": "Ski-out 直接開滑，寬廣壓雪道與鬆雪；午餐雪場餐廳熱食。", "maps": [{"label": "地圖", "q": "富良野スキー場 富良野ゾーン"}]}, {"t": false, "when": "溫泉", "title": "溫泉放鬆", "hours": null, "body": "浸泡「紫彩之湯」天然溫泉。", "maps": [{"label": "地圖", "q": "富良野温泉 紫彩の湯"}]}, {"t": false, "when": "晚餐", "title": "百匯晚餐", "hours": null, "body": "飯店內豐盛晚餐，大廳壁爐區放鬆休息。", "maps": [{"label": "地圖", "q": "新富良野プリンスホテル"}]}], "stay": "新富良野王子大飯店（兩晚）", "stayq": "新富良野プリンスホテル", "note": null}, {"n": 7, "date": "2026-11-30", "sub": "富良野滑雪次日", "title": "登山纜車與頂級粉雪", "items": [{"t": false, "when": "滑雪", "title": "登山纜車暢滑", "hours": "8:30–16:00", "body": "富良野空中纜車（Ropeway）直達山頂，遠眺十勝岳連峰，暢滑長距離巡航滑道與粉雪地形。", "maps": [{"label": "地圖", "q": "富良野ロープウェー"}]}, {"t": false, "when": "溫泉", "title": "泡湯與預先收納", "hours": null, "body": "享受溫泉，將非必要換洗衣物先收進大行李箱，利於隔日迅速退房。", "maps": [{"label": "地圖", "q": "富良野温泉 紫彩の湯"}]}, {"t": false, "when": "晚餐", "title": "晚餐放鬆", "hours": null, "body": "飯店晚餐，漫步夜間精靈露台。", "maps": [{"label": "地圖", "q": "ニングルテラス"}]}], "stay": "新富良野王子大飯店（兩晚）", "stayq": "新富良野プリンスホテル", "note": null}, {"n": 8, "date": "2026-12-01", "sub": "富良野 → 札幌", "title": "富良野壓軸粉雪・全程大眾運輸回札幌", "items": [{"t": false, "when": "退房", "title": "早餐・退房", "hours": null, "body": "自助百匯早餐後退房，大行李寄放櫃檯；1F 乾燥置物櫃取出雪板雪靴，直接換裝開滑。", "maps": []}, {"t": false, "when": "滑雪", "title": "壓軸粉雪日", "hours": "8:30–16:00", "body": "盡享富良野 Zone 寬廣雪道與優質粉雪，中午雪場餐廳熱食。", "maps": [{"label": "地圖", "q": "富良野スキー場"}]}, {"t": false, "when": "整裝", "title": "準時收工・換裝・封袋", "hours": null, "body": "準時滑回飯店門口，換回便服與防滑鞋；擦乾雪板，3 人雪板雪靴裝袋封妥；領回大行李清點。", "maps": []}, {"t": true, "when": "15:55–16:15", "title": "第一段｜快速薰衣草號", "hours": null, "body": "飯店正門玄關外候車亭上車 → JR 富良野站前，每人 260 円（投現或刷卡）。", "maps": [{"label": "路線", "o": "新富良野プリンスホテル", "d": "富良野駅"}]}, {"t": true, "when": "16:15–16:50", "title": "車站轉乘緩衝", "hours": null, "body": "35 分鐘餘裕：候車室取暖、洗手間、採買車上飲品點心。", "maps": []}, {"t": true, "when": "16:50–19:25", "title": "第二段｜高速富良野號（當日末班）", "hours": null, "body": "富良野站前 → 札幌車站前，每人 2,500 円。雪板袋與大行李平放下層行李艙；車內暖氣、充電座，補眠約 2.5 小時。", "maps": [{"label": "路線", "o": "富良野駅", "d": "札幌駅"}]}, {"t": true, "when": "19:25–19:40", "title": "步行入住", "hours": null, "body": "提領雪具行李，經札幌站北口連通道步行約 5 分鐘至 KEIO PRELIA HOTEL Sapporo。", "maps": [{"label": "地圖", "q": "京王プレリアホテル札幌"}]}, {"t": false, "when": "晚餐", "title": "晚餐・大浴場", "hours": "Stellar Place 餐廳 11:00–23:00", "body": "Stellar Place 或大丸百貨美食街（如根室花丸壽司、熱拉麵）；回房享受專屬大浴場。", "maps": [{"label": "地圖", "q": "札幌ステラプレイス"}]}], "stay": "KEIO PRELIA HOTEL Sapporo", "stayq": "京王プレリアホテル札幌", "note": null}, {"n": 9, "date": "2026-12-02", "sub": "小樽 → 手稻 → 札幌", "title": "小樽海鮮運河・白色戀人公園點燈", "items": [{"t": true, "when": "08:30–09:15", "title": "札幌 → 南小樽", "hours": null, "body": "步行 5 分至 JR 札幌站，搭快速 Airport／區間快速往小樽方向，南小樽下車（約 40 分，750 円）。過「朝里」後右側車窗是石狩灣雪海。", "maps": [{"label": "路線", "o": "札幌駅", "d": "南小樽駅"}]}, {"t": false, "when": "景點", "title": "童話十字路口・堺町通", "hours": "音樂盒堂 9:00–18:00", "body": "南小樽站步行約 7 分：小樽音樂盒堂本館與蒸汽鐘 → 沿堺町通北行，LeTAO 本店早茶（雙層起司蛋糕，9:00–18:00）、北一硝子（10:00–18:00）、六花亭（10:00–18:00）、北菓樓。", "maps": [{"label": "音樂盒堂", "q": "小樽オルゴール堂 本館"}, {"label": "LeTAO", "q": "ルタオ 本店 小樽"}, {"label": "北一硝子", "q": "北一硝子 三号館"}]}, {"t": false, "when": "購物", "title": "大正硝子館", "hours": "9:00–18:00", "body": "堺町通北端轉入色內，挑選手工玻璃小物。", "maps": [{"label": "地圖", "q": "大正硝子館 本店 小樽"}]}, {"t": false, "when": "景點", "title": "小樽運河散策", "hours": "運河全天開放・運河館 9:30–17:00", "body": "步行 2 分至運河，淺草橋 → 中央橋紅磚倉庫步道拍雪景倒影，順遊小樽市綜合博物館運河館。", "maps": [{"label": "運河", "q": "小樽運河 浅草橋"}, {"label": "運河館", "q": "小樽市総合博物館 運河館"}]}, {"t": false, "when": "午餐", "title": "三角市場午餐", "hours": "約 6:00–17:00・各店不同", "body": "步行約 10 分至小樽站旁。海鮮丼（海膽、干貝、鮭魚卵）配花咲蟹味噌湯。", "maps": [{"label": "地圖", "q": "小樽 三角市場"}]}, {"t": false, "when": "景點", "title": "船見坂 → 小樽站", "hours": "全天開放", "body": "步行 2 分至船見坂拍坡道海景，再走 4 分進 JR 小樽站。", "maps": [{"label": "地圖", "q": "船見坂 小樽"}]}, {"t": true, "when": "13:45–14:50", "title": "小樽 → 白色戀人公園", "hours": null, "body": "JR 往札幌方向至手稻站（約 30 分）。末端接駁：A 計程車約 10 分（約 1,800 円，每人 600 円）；B JR 巴士宮 49／手 41 至「西町北 20 丁目」步行 5 分（210 円）。", "maps": [{"label": "路線", "o": "小樽駅", "d": "白い恋人パーク"}]}, {"t": false, "when": "景點", "title": "白色戀人公園", "hours": "10:00–18:00・有料區最後入館 16:30", "body": "餅乾產線、巧克力博物館、生巧克力霜淇淋與熱可可；傍晚天色轉暗，紅磚城堡與覆雪庭園冬季彩燈亮起。", "maps": [{"label": "地圖", "q": "白い恋人パーク"}]}, {"t": true, "when": "17:20–17:45", "title": "回札幌市區", "hours": null, "body": "步行 7 分至東西線宮之澤站（起點站必有座位）→ 大通站，15 分鐘，290 円。", "maps": [{"label": "路線", "o": "白い恋人パーク", "d": "大通駅"}]}, {"t": false, "when": "晚餐", "title": "慶功晚餐・免稅採買", "hours": null, "body": "大通地下街或狸小路，湯咖哩或成吉思汗；採買伴手禮藥妝後，南北線 1 站或地下街步行約 12 分回飯店。", "maps": [{"label": "地圖", "q": "狸小路商店街"}]}], "stay": "KEIO PRELIA HOTEL Sapporo", "stayq": "京王プレリアホテル札幌", "note": null}, {"n": 10, "date": "2026-12-03", "sub": "札幌 → 台灣", "title": "新千歲機場伴手禮・超規雪具托運・返台", "items": [{"t": true, "when": "08:30–09:00", "title": "退房出發", "hours": null, "body": "退房後步行 5 分鐘至 JR 札幌站月台。", "maps": [{"label": "地圖", "q": "京王プレリアホテル札幌"}]}, {"t": true, "when": "09:06–09:43", "title": "JR 快速 Airport 號", "hours": null, "body": "札幌站 → 新千歲機場站，約 37 分鐘，每人 1,150 円。", "maps": [{"label": "路線", "o": "札幌駅", "d": "新千歳空港駅"}]}, {"t": false, "when": "景點", "title": "哆啦A夢驚喜空中樂園", "hours": "10:00–18:00・入場至 17:30", "body": "連絡設施 3F Smile Road，大人 800 円。秘密道具主題遊樂區、限定商店與咖啡廳。", "maps": [{"label": "地圖", "q": "ドラえもん わくわくスカイパーク"}]}, {"t": false, "when": "購物", "title": "橡子共和國・伴手禮・午餐", "hours": null, "body": "吉卜力專賣店橡子共和國挑龍貓周邊；3F「北海道拉麵道場」一幻拉麵；六花亭、北菓樓、Kinotoya 起司塔、Royce’ 生巧克力。", "maps": [{"label": "橡子共和國", "q": "どんぐり共和国 新千歳空港"}, {"label": "拉麵道場", "q": "北海道ラーメン道場 新千歳空港"}]}, {"t": true, "when": "11:30–12:30", "title": "報到・長雪具托運", "hours": null, "body": "國際線櫃檯辦理登機與超規長雪板托運。", "maps": [{"label": "地圖", "q": "新千歳空港 国際線ターミナル"}]}, {"t": true, "when": "12:30–", "title": "出境返台", "hours": null, "body": "通關出境，免稅店最後採買，搭機返台，圓滿完成旅程。", "maps": []}], "stay": null, "stayq": null, "note": null}];
+const DAYS = [{"n": 1, "date": "2026-11-24", "sub": "札幌", "title": "抵達北海道・雪具採買・烤肉與 moyuk 扭蛋", "items": [{"t": true, "when": "06:15–10:55", "title": "航班移動", "hours": null, "body": "台灣虎航 IT234 桃園起飛，10:55 抵達新千歲機場國際線，入境提領行李。", "maps": []}, {"t": true, "when": "12:00–12:50", "title": "前往札幌市區", "hours": null, "body": "JR 快速 Airport 號至札幌站（約 37 分），轉地鐵南北線 1 站至大通站，或計程車約 5 分鐘。", "maps": [{"label": "路線", "o": "新千歳空港駅", "d": "大通駅"}]}, {"t": false, "when": "住宿", "title": "飯店辦理手續", "hours": null, "body": "抵達 La’gent Stay 札幌大通，辦理入住，大行李寄存櫃檯。", "maps": [{"label": "地圖", "q": "La'gent Stay Sapporo Odori"}]}, {"t": false, "when": "午餐", "title": "狸小路午餐", "hours": null, "body": "飯店對面狸小路 5 丁目周邊熱食，如 Suage+ 湯咖哩或在地拉麵。", "maps": [{"label": "地圖", "q": "狸小路5丁目 札幌"}]}, {"t": false, "when": "購物", "title": "二手雪具採買・兩階段策略", "hours": null, "body": "① 徒步圈：2nd STREET 狸小路 4 丁目店（雪靴／配件・10:00–21:00）→ Murasaki Sports 札幌 PARCO 4F（中古板、雪鞋試穿與角度調校・10:00–20:00）→ MOJANE（單板專門店）。買齊直接手提 3–5 分鐘回房。<br>② 備案：薄野搭定鐵巴士約 25 分鐘至 2nd OUTDOOR 川沿店 ＋ BOOKOFF PLUS 川沿店；買完合叫休旅計程車回飯店（約 20 分，約 3,000 円）。", "maps": [{"label": "2nd STREET", "q": "セカンドストリート 狸小路4丁目店"}, {"label": "Murasaki", "q": "ムラサキスポーツ 札幌パルコ"}, {"label": "MOJANE", "q": "MOJANE 札幌"}, {"label": "2nd OUTDOOR", "q": "2nd OUTDOOR 札幌川沿店"}]}, {"t": false, "when": "休整", "title": "返回飯店休整", "hours": null, "body": "雪板、雪鞋送入房間放置。", "maps": []}, {"t": false, "when": "晚餐", "title": "晚餐｜成吉思汗 いただきます。", "hours": "16:00–23:00", "body": "南 5 條西 5 丁目，步行約 5 分鐘。自營牧場純種薩福克生羊肉與內臟拼盤，鮮甜無羶。", "maps": [{"label": "地圖", "q": "ジンギスカン 羊飼いの店 いただきます。 札幌"}]}, {"t": false, "when": "扭蛋", "title": "扭蛋店 1｜ガチャガチャの森 moyukSAPPORO", "hours": "～20:00", "body": "moyuk SAPPORO 3F，森林風扭蛋牆、最新正版 IP 與生活模型。", "maps": [{"label": "地圖", "q": "ガチャガチャの森 moyukSAPPORO"}]}, {"t": false, "when": "購物", "title": "超市採買與裝備整頓", "hours": "唐吉訶德 24 小時", "body": "狸小路唐吉訶德採買高熱量零食、能量凍與早餐；回房將裝備裝袋。", "maps": [{"label": "地圖", "q": "ドン・キホーテ 札幌狸小路本店"}]}, {"t": false, "when": "溫泉", "title": "泡湯休整", "hours": null, "body": "館內 3F 天然地底溫泉「ぽんの湯」。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 2, "date": "2026-11-25", "sub": "滑雪 Day 1", "title": "札幌國際滑雪場・雪具寄放・AOAO 水族館", "items": [{"t": false, "when": "出發", "title": "晨間整頓・步行出發", "hours": null, "body": "換穿雪服，攜雪板袋、雪靴袋與隨身包，步行 3 分鐘至對面札幌東急 REI 酒店正門。", "maps": [{"label": "地圖", "q": "札幌東急REIホテル"}]}, {"t": true, "when": "08:50–10:20", "title": "專車上山", "hours": null, "body": "定鐵巴士預約專車，雪板放車底行李艙，直達滑雪中心。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "購票與更衣", "hours": null, "body": "領取纜車票，更衣室換雪靴，便鞋鎖進置物櫃。", "maps": []}, {"t": false, "when": "滑雪", "title": "暢滑雪道", "hours": "平日 9:00–17:00", "body": "札幌國際滑雪場。適應新板腳感，暢滑天然粉雪；午餐於雪場 2F 餐廳。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "雪具過夜寄存", "hours": null, "body": "換回便鞋，3 套雪板與雪靴送至滑雪中心 B1F Cloak 人工寄存處（每件約 300–500 円／晚）。", "maps": []}, {"t": true, "when": "16:00–17:30", "title": "專車返回市區", "hours": null, "body": "雙手空空搭 16:00 巴士回東急 REI，步行回飯店換保暖便服。", "maps": []}, {"t": false, "when": "晚餐", "title": "晚餐｜湯咖哩二選一", "hours": null, "body": "<b>首選 Soup Curry TREASURE</b>（南 2 條西 1 丁目，步行約 4 分）：和風海鮮高湯，39 席、營業 11:30–22:30，3 人好入座。<b>備案 SOUP CURRY KING セントラル</b>（南 2 條西 3 丁目 B1）：豚骨雞骨＋和風雙湯頭的超人氣名店，座位少常排隊，離 AOAO 最近。", "maps": [{"label": "TREASURE", "q": "スープカレー TREASURE 札幌"}, {"label": "KING", "q": "SOUP CURRY KING セントラル 札幌"}]}, {"t": false, "when": "景點", "title": "AOAO SAPPORO 都市水族館", "hours": "10:00–22:00・最後入館 21:00", "body": "moyuk SAPPORO 4–6F。避開風雪，看跳岩企鵝、發光水母與沉浸式光影海洋展。", "maps": [{"label": "地圖", "q": "AOAO SAPPORO"}]}, {"t": false, "when": "扭蛋", "title": "扭蛋店 2｜#C-pla 狸小路 5 丁目店", "hours": "10:00–22:00", "body": "800–1,000 台扭蛋機，動漫、搞怪小物與懷舊系列。", "maps": [{"label": "地圖", "q": "#C-pla 狸小路5丁目店"}]}, {"t": false, "when": "溫泉", "title": "溫泉舒緩", "hours": null, "body": "步行 1 分鐘回房，「ぽんの湯」舒緩大腿肌肉。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 3, "date": "2026-11-26", "sub": "滑雪 Day 2", "title": "味噌拉麵・Nikka 爺爺・PARCO 扭蛋・白色燈樹節", "items": [{"t": false, "when": "出發", "title": "輕裝出發", "hours": null, "body": "房內早餐，只背隨身小包（雪鏡、手套），步行 3 分鐘至東急 REI 前搭車。", "maps": [{"label": "地圖", "q": "札幌東急REIホテル"}]}, {"t": true, "when": "08:50–10:40", "title": "專車上山・領雪具", "hours": null, "body": "雙手空空搭專車，至 B1F Cloak 憑牌領出雪板與雪靴。", "maps": []}, {"t": false, "when": "滑雪", "title": "暢滑雪道", "hours": "平日 9:00–17:00", "body": "札幌國際滑雪場全天粉雪；中午雪場餐廳用餐。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "再次過夜寄存", "hours": null, "body": "換回便鞋，雪具交回 B1F Cloak，隔天滑完再領。", "maps": []}, {"t": true, "when": "16:00–18:15", "title": "回市區・換裝整備", "hours": null, "body": "16:00 巴士約 17:15–17:30 抵東急 REI；回飯店換保暖便服、防寒大衣與防滑便鞋。", "maps": []}, {"t": false, "when": "晚餐", "title": "晚餐｜麵屋 雪風 薄野本店", "hours": "18:00–翌 3:00", "body": "南 7 條西 4 丁目，步行約 6 分鐘。晚餐時段早點到可避開續攤與深夜長隊；三種味噌調配的濃郁熱湯，配炙燒叉燒與溏心蛋，迅速補足體力。", "maps": [{"label": "地圖", "q": "麺屋 雪風 すすきの"}]}, {"t": false, "when": "景點", "title": "Nikka Whisky Sign", "hours": "夜間點燈", "body": "往北 2 個街區至薄野十字路口，在彩色霓虹「威士忌爺爺」下合影，感受不夜城。", "maps": [{"label": "地圖", "q": "ニッカウヰスキー 看板 すすきの交差点"}]}, {"t": false, "when": "購物", "title": "札幌 PARCO｜CASETiFY ＆ #C-pla", "hours": "PARCO 10:00–20:00", "body": "沿站前通北行約 3 分鐘。1F CASETiFY STUDIO 挑北海道限定或聯名手機殼，再上 7F #C-pla 快速轉限定扭蛋。", "maps": [{"label": "地圖", "q": "札幌PARCO"}]}, {"t": false, "when": "景點", "title": "大通公園・白色燈樹節＆耶誕市集", "hours": "燈飾約 16:30–22:00・市集至 21:00", "body": "步行 2 分鐘。白雪光雕與橘紅暖光的札幌電視塔；1–2 丁目慕尼黑耶誕市集（最後點餐 20:45）品嚐德國美食、熱紅酒，挑雪花球與耶誕雜貨。", "maps": [{"label": "地圖", "q": "大通公園 西2丁目 札幌"}]}, {"t": false, "when": "溫泉", "title": "漫步回房・泡湯", "hours": null, "body": "步行 3–4 分鐘返回飯店，「ぽんの湯」舒緩全身。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 4, "date": "2026-11-27", "sub": "滑雪 Day 3", "title": "札幌國際收官・雪具載回・夜聖代・薄野漫步", "items": [{"t": true, "when": "07:30–10:40", "title": "出發・上山・領雪具", "hours": null, "body": "輕裝步行至東急 REI 前，08:50 專車直達滑雪中心，至 B1F Cloak 憑牌領出裝備。", "maps": [{"label": "地圖", "q": "札幌東急REIホテル"}]}, {"t": false, "when": "滑雪", "title": "札幌國際最後一天", "hours": "平日 9:00–17:00", "body": "盡情享受粉雪；中午雪場餐廳用餐。", "maps": [{"label": "地圖", "q": "札幌国際スキー場"}]}, {"t": false, "when": "雪場", "title": "領回全部雪具並裝袋", "hours": null, "body": "領出 3 人雪板與雪靴，完整裝入雪板袋封妥，準備隨車載回。", "maps": []}, {"t": true, "when": "16:00–17:30", "title": "專車載運裝備回市區", "hours": null, "body": "雪板袋放行李艙，抵東急 REI 後提著裝備步行 3 分鐘回房。", "maps": []}, {"t": false, "when": "休整", "title": "飯店休整換裝", "hours": null, "body": "換穿輕鬆保暖便服。", "maps": []}, {"t": false, "when": "晚餐", "title": "悠閒晚餐", "hours": null, "body": "薄野／狸小路隨性小品：在地居酒屋小食、烤鳥串或熱湯定食。", "maps": []}, {"t": false, "when": "甜點", "title": "結尾夜聖代（シメパフェ）｜Parfaiteria Pal", "hours": "週五 18:00–翌 2:00", "body": "南 4 條西 2 丁目 10-1 6F，步行約 3 分鐘。生乳霜淇淋、酸甜雪酪與時令水果雕琢的藝術聖代。", "maps": [{"label": "地圖", "q": "パフェテリア パル 札幌"}]}, {"t": false, "when": "散策", "title": "薄野至狸小路夜遊", "hours": "唐吉訶德 24 小時", "body": "沿薄野中央通穿梭至狸小路拱廊，逛特色小店、藥妝或唐吉訶德，看覆雪街道霓虹。", "maps": [{"label": "地圖", "q": "狸小路商店街"}]}, {"t": false, "when": "溫泉", "title": "最後一晚ぽんの湯", "hours": null, "body": "行李隔天退房前順手整理裝箱即可。", "maps": []}], "stay": "北海道札幌大通公園拉根特住宿酒店（La’gent Stay 札幌大通）", "stayq": "La'gent Stay Sapporo Odori", "note": null}, {"n": 5, "date": "2026-11-28", "sub": "札幌 → 富良野", "title": "雙神社地鐵巡禮・高速大巴轉場新富良野", "items": [{"t": true, "when": "08:30–09:00", "title": "退房・裝備轉移寄放", "hours": null, "body": "大通飯店退房，計程車將大裝備送往 JR 札幌站北口寄放。", "maps": [{"label": "地圖", "q": "JR札幌駅 北口"}]}, {"t": false, "when": "景點", "title": "北海道神宮", "hours": "開放 11 月 7:00–16:00", "body": "地鐵至圓山公園站，悠閒參拜，於六花亭神宮茶屋享用現烤判官餅。", "maps": [{"label": "地圖", "q": "北海道神宮"}]}, {"t": true, "when": "10:45–11:20", "title": "神社間大眾運輸動線", "hours": null, "body": "北海道神宮 → 札幌諏訪神社，合併計費僅 250 円／人<ol class=\"steps\"><li>步行 10–12 分：穿過「公園口鳥居」至圓山公園站 3 號入口</li><li>東西線約 5 分：圓山公園 → 大通（往新札幌，3 站），依藍色東豐線指標前進</li><li>站內轉乘 4–5 分：地下連通道至東豐線月台（往榮町）</li><li>東豐線約 5 分：大通 → 北 13 條東（3 站）</li><li>步行約 3 分：2 號出口直走抵諏訪神社正門</li></ol>", "maps": [{"label": "路線", "o": "北海道神宮", "d": "札幌諏訪神社"}]}, {"t": false, "when": "景點", "title": "札幌諏訪神社", "hours": "參拜自由", "body": "季節鮮花手水，求取特色御朱印。", "maps": [{"label": "地圖", "q": "札幌諏訪神社"}]}, {"t": false, "when": "午餐", "title": "漫步回札幌站北口・午餐", "hours": null, "body": "往西南步行約 10–12 分鐘。", "maps": [{"label": "地圖", "q": "JR札幌駅 北口"}]}, {"t": false, "when": "購物", "title": "車上點心・提領裝備", "hours": "大丸 10:00–20:00", "body": "站前シマエナガ Creperie 買雪之妖精造型甜點當車上點心（或大丸 B1 外帶），領回雪具與大行李。", "maps": [{"label": "地圖", "q": "大丸札幌店"}]}, {"t": true, "when": "14:25–14:50", "title": "札幌站前 2 號站牌", "hours": null, "body": "排隊搭乘 14:50 發車的高速富良野號。", "maps": [{"label": "地圖", "q": "札幌駅前 高速ふらの号 のりば"}]}, {"t": true, "when": "14:50–17:22", "title": "高速富良野號", "hours": null, "body": "一路前往富良野，17:22 抵達 JR 富良野站前。", "maps": [{"label": "路線", "o": "札幌駅前", "d": "富良野駅"}]}, {"t": true, "when": "17:22–17:48", "title": "轉乘快速薰衣草號", "hours": null, "body": "站前公車乘車處轉乘富良野巴士「快速薰衣草號」（或西達布線），17:30 發車，17:48 直達新富良野王子大飯店。", "maps": [{"label": "路線", "o": "富良野駅", "d": "新富良野プリンスホテル"}]}, {"t": false, "when": "住宿", "title": "入住・百匯晚餐・泡湯", "hours": null, "body": "行李送入房間，享用飯店豐盛百匯晚餐，泡湯放鬆。", "maps": [{"label": "地圖", "q": "新富良野プリンスホテル"}]}], "stay": "新富良野王子大飯店（連住三晚）", "stayq": "新富良野プリンスホテル", "note": null}, {"n": 6, "date": "2026-11-29", "sub": "富良野滑雪首日", "title": "Furano Zone 暢滑", "items": [{"t": false, "when": "早餐", "title": "晨間整裝", "hours": null, "body": "挑高雪景自助百匯早餐，1F 取出雪板。", "maps": []}, {"t": false, "when": "滑雪", "title": "富良野全日暢滑", "hours": "8:30–16:00", "body": "Ski-out 直接開滑，寬廣壓雪道與鬆雪；午餐雪場餐廳熱食。", "maps": [{"label": "地圖", "q": "富良野スキー場 富良野ゾーン"}]}, {"t": false, "when": "溫泉", "title": "溫泉放鬆", "hours": null, "body": "浸泡「紫彩之湯」天然溫泉。", "maps": [{"label": "地圖", "q": "富良野温泉 紫彩の湯"}]}, {"t": false, "when": "晚餐", "title": "百匯晚餐", "hours": null, "body": "飯店內豐盛晚餐，大廳壁爐區放鬆休息。", "maps": [{"label": "地圖", "q": "新富良野プリンスホテル"}]}], "stay": "新富良野王子大飯店（連住三晚）", "stayq": "新富良野プリンスホテル", "note": null}, {"n": 7, "date": "2026-11-30", "sub": "富良野滑雪次日", "title": "登山纜車與頂級粉雪", "items": [{"t": false, "when": "滑雪", "title": "登山纜車暢滑", "hours": "8:30–16:00", "body": "富良野空中纜車（Ropeway）直達山頂，遠眺十勝岳連峰，暢滑長距離巡航滑道與粉雪地形。", "maps": [{"label": "地圖", "q": "富良野ロープウェー"}]}, {"t": false, "when": "溫泉", "title": "泡湯與預先收納", "hours": null, "body": "享受溫泉，將非必要換洗衣物先收進大行李箱，利於隔日迅速退房。", "maps": [{"label": "地圖", "q": "富良野温泉 紫彩の湯"}]}, {"t": false, "when": "晚餐", "title": "晚餐放鬆", "hours": null, "body": "飯店晚餐，漫步夜間精靈露台。", "maps": [{"label": "地圖", "q": "ニングルテラス"}]}], "stay": "新富良野王子大飯店（連住三晚）", "stayq": "新富良野プリンスホテル", "note": null}, {"n": 8, "date": "2026-12-01", "sub": "富良野 → 札幌", "title": "富良野壓軸粉雪・全程大眾運輸回札幌", "items": [{"t": false, "when": "退房", "title": "早餐・退房", "hours": null, "body": "自助百匯早餐後退房，大行李寄放櫃檯；1F 乾燥置物櫃取出雪板雪靴，直接換裝開滑。", "maps": []}, {"t": false, "when": "滑雪", "title": "壓軸粉雪日", "hours": "8:30–16:00", "body": "盡享富良野 Zone 寬廣雪道與優質粉雪，中午雪場餐廳熱食。", "maps": [{"label": "地圖", "q": "富良野スキー場"}]}, {"t": false, "when": "整裝", "title": "準時收工・換裝・封袋", "hours": null, "body": "準時滑回飯店門口，換回便服與防滑鞋；擦乾雪板，3 人雪板雪靴裝袋封妥；領回大行李清點。", "maps": []}, {"t": true, "when": "15:55–16:15", "title": "第一段｜快速薰衣草號", "hours": null, "body": "飯店正門玄關外候車亭上車 → JR 富良野站前，每人 260 円（投現或刷卡）。", "maps": [{"label": "路線", "o": "新富良野プリンスホテル", "d": "富良野駅"}]}, {"t": true, "when": "16:15–16:50", "title": "車站轉乘緩衝", "hours": null, "body": "35 分鐘餘裕：候車室取暖、洗手間、採買車上飲品點心。", "maps": []}, {"t": true, "when": "16:50–19:25", "title": "第二段｜高速富良野號（當日末班）", "hours": null, "body": "富良野站前 → 札幌車站前，每人 2,500 円。雪板袋與大行李平放下層行李艙；車內暖氣、充電座，補眠約 2.5 小時。", "maps": [{"label": "路線", "o": "富良野駅", "d": "札幌駅"}]}, {"t": true, "when": "19:25–19:40", "title": "步行入住", "hours": null, "body": "提領雪具行李，經札幌站北口連通道步行約 5 分鐘至 KEIO PRELIA HOTEL Sapporo。", "maps": [{"label": "地圖", "q": "京王プレリアホテル札幌"}]}, {"t": false, "when": "晚餐", "title": "晚餐・大浴場", "hours": "Stellar Place 餐廳 11:00–23:00", "body": "Stellar Place 或大丸百貨美食街（如根室花丸壽司、熱拉麵）；回房享受專屬大浴場。", "maps": [{"label": "地圖", "q": "札幌ステラプレイス"}]}], "stay": "KEIO PRELIA HOTEL Sapporo", "stayq": "京王プレリアホテル札幌", "note": null}, {"n": 9, "date": "2026-12-02", "sub": "小樽 → 手稻 → 札幌", "title": "小樽海鮮運河・白色戀人公園點燈", "items": [{"t": true, "when": "08:30–09:15", "title": "札幌 → 南小樽", "hours": null, "body": "步行 5 分至 JR 札幌站，搭快速 Airport／區間快速往小樽方向，南小樽下車（約 40 分，750 円）。過「朝里」後右側車窗是石狩灣雪海。", "maps": [{"label": "路線", "o": "札幌駅", "d": "南小樽駅"}]}, {"t": false, "when": "景點", "title": "童話十字路口・堺町通", "hours": "音樂盒堂 9:00–18:00", "body": "南小樽站步行約 7 分：小樽音樂盒堂本館與蒸汽鐘 → 沿堺町通北行，LeTAO 本店早茶（雙層起司蛋糕，9:00–18:00）、北一硝子（10:00–18:00）、六花亭（10:00–18:00）、北菓樓。", "maps": [{"label": "音樂盒堂", "q": "小樽オルゴール堂 本館"}, {"label": "LeTAO", "q": "ルタオ 本店 小樽"}, {"label": "北一硝子", "q": "北一硝子 三号館"}]}, {"t": false, "when": "購物", "title": "大正硝子館", "hours": "9:00–18:00", "body": "堺町通北端轉入色內，挑選手工玻璃小物。", "maps": [{"label": "地圖", "q": "大正硝子館 本店 小樽"}]}, {"t": false, "when": "景點", "title": "小樽運河散策", "hours": "運河全天開放・運河館 9:30–17:00", "body": "步行 2 分至運河，淺草橋 → 中央橋紅磚倉庫步道拍雪景倒影，順遊小樽市綜合博物館運河館。", "maps": [{"label": "運河", "q": "小樽運河 浅草橋"}, {"label": "運河館", "q": "小樽市総合博物館 運河館"}]}, {"t": false, "when": "午餐", "title": "三角市場午餐", "hours": "約 6:00–17:00・各店不同", "body": "步行約 10 分至小樽站旁。海鮮丼（海膽、干貝、鮭魚卵）配花咲蟹味噌湯。", "maps": [{"label": "地圖", "q": "小樽 三角市場"}]}, {"t": false, "when": "景點", "title": "船見坂 → 小樽站", "hours": "全天開放", "body": "步行 2 分至船見坂拍坡道海景，再走 4 分進 JR 小樽站。", "maps": [{"label": "地圖", "q": "船見坂 小樽"}]}, {"t": true, "when": "13:45–14:50", "title": "小樽 → 白色戀人公園", "hours": null, "body": "JR 往札幌方向至手稻站（約 30 分）。末端接駁：A 計程車約 10 分（約 1,800 円，每人 600 円）；B JR 巴士宮 49／手 41 至「西町北 20 丁目」步行 5 分（210 円）。", "maps": [{"label": "路線", "o": "小樽駅", "d": "白い恋人パーク"}]}, {"t": false, "when": "景點", "title": "白色戀人公園", "hours": "10:00–18:00・有料區最後入館 16:30", "body": "餅乾產線、巧克力博物館、生巧克力霜淇淋與熱可可；傍晚天色轉暗，紅磚城堡與覆雪庭園冬季彩燈亮起。", "maps": [{"label": "地圖", "q": "白い恋人パーク"}]}, {"t": true, "when": "17:20–17:45", "title": "回札幌市區", "hours": null, "body": "步行 7 分至東西線宮之澤站（起點站必有座位）→ 大通站，15 分鐘，290 円。", "maps": [{"label": "路線", "o": "白い恋人パーク", "d": "大通駅"}]}, {"t": false, "when": "晚餐", "title": "慶功晚餐・免稅採買", "hours": null, "body": "大通地下街或狸小路，湯咖哩或成吉思汗；採買伴手禮藥妝後，南北線 1 站或地下街步行約 12 分回飯店。", "maps": [{"label": "地圖", "q": "狸小路商店街"}]}], "stay": "KEIO PRELIA HOTEL Sapporo", "stayq": "京王プレリアホテル札幌", "note": null}, {"n": 10, "date": "2026-12-03", "sub": "札幌 → 台灣", "title": "新千歲機場伴手禮・超規雪具托運・返台", "items": [{"t": true, "when": "08:30–09:00", "title": "退房出發", "hours": null, "body": "退房後步行 5 分鐘至 JR 札幌站月台。", "maps": [{"label": "地圖", "q": "京王プレリアホテル札幌"}]}, {"t": true, "when": "09:06–09:43", "title": "JR 快速 Airport 號", "hours": null, "body": "札幌站 → 新千歲機場站，約 37 分鐘，每人 1,150 円。", "maps": [{"label": "路線", "o": "札幌駅", "d": "新千歳空港駅"}]}, {"t": false, "when": "景點", "title": "哆啦A夢驚喜空中樂園", "hours": "10:00–18:00・入場至 17:30", "body": "連絡設施 3F Smile Road，大人 800 円。秘密道具主題遊樂區、限定商店與咖啡廳。", "maps": [{"label": "地圖", "q": "ドラえもん わくわくスカイパーク"}]}, {"t": false, "when": "購物", "title": "橡子共和國・伴手禮・午餐", "hours": null, "body": "吉卜力專賣店橡子共和國挑龍貓周邊；3F「北海道拉麵道場」一幻拉麵；六花亭、北菓樓、Kinotoya 起司塔、Royce’ 生巧克力。", "maps": [{"label": "橡子共和國", "q": "どんぐり共和国 新千歳空港"}, {"label": "拉麵道場", "q": "北海道ラーメン道場 新千歳空港"}]}, {"t": true, "when": "11:30–12:30", "title": "報到・長雪具托運", "hours": null, "body": "國際線櫃檯辦理登機與超規長雪板托運。", "maps": [{"label": "地圖", "q": "新千歳空港 国際線ターミナル"}]}, {"t": true, "when": "12:30–", "title": "出境返台", "hours": null, "body": "通關出境，免稅店最後採買，搭機返台，圓滿完成旅程。", "maps": []}], "stay": null, "stayq": null, "note": null}];
 const WEEK = ['日','一','二','三','四','五','六'];
 const C = ['var(--rose)','var(--blue)','var(--blue)','var(--blue)','var(--plum)','var(--sage)','var(--sage)','var(--mustard)','var(--rose)','var(--plum)'];
 const SHORT = ['抵達札幌・雪具採買','札幌國際・AOAO','札幌國際・燈樹節','札幌國際・夜聖代','神社巡禮 → 富良野','富良野 Zone 暢滑','登山纜車・粉雪','富良野 → 札幌','小樽・白色戀人','新千歲・返台'];
-const REGION = ['札幌','札幌國際','札幌國際','札幌國際','札幌 → 富良野','富良野','富良野','富良野 → 札幌','小樽','新千歲'];
 
 /* line icons */
 const P = {
@@ -425,12 +392,13 @@ const CAT = {'滑雪':'ski','雪場':'ski','晚餐':'food','午餐':'food','早�
 const CATEN = {'滑雪':'SKI','雪場':'SKI BASE','晚餐':'DINNER','午餐':'LUNCH','早餐':'BREAKFAST','甜點':'DESSERT','扭蛋':'GACHA','購物':'SHOP','散策':'STROLL','溫泉':'ONSEN','住宿':'CHECK-IN','休整':'REST','景點':'SPOT','出發':'READY','退房':'CHECK-OUT','整裝':'GEAR UP'};
 function moveIcon(it){ const s = it.title + it.body.slice(0,40);
   if (/航班|出境|報到/.test(s)) return 'plane'; if (/計程車/.test(it.body) && /退房/.test(it.title)) return 'car';
+  if (/JR|電車|地鐵/.test(it.title) || /^JR/.test(it.body)) return 'train';
   if (/巴士|專車|號|公車/.test(s)) return 'bus'; if (/步行入住|退房出發/.test(it.title)) return 'walk'; return 'train'; }
 
 let done = {};
 try { done = JSON.parse(localStorage.getItem('hk-done') || '{}') || {}; } catch (e) { done = {}; }
 function save(){ try { localStorage.setItem('hk-done', JSON.stringify(done)); } catch (e) {} }
-function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function mapUrl(m){ return m.o ? 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(m.o) + '&destination=' + encodeURIComponent(m.d) + '&travelmode=transit' : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(m.q); }
 function mapLink(m){ return '<a class="map" href="' + mapUrl(m) + '" target="_blank" rel="noopener">' + I(m.o ? 'route' : 'pin') + esc(m.label) + '</a>'; }
 function dayDate(d){ const [y,m,dd] = d.date.split('-').map(Number); return new Date(y, m-1, dd); }
@@ -523,6 +491,7 @@ function openMenu(){
 function closeMenu(){
   const d = document.getElementById('drawer'), s = document.getElementById('scrim');
   if (d.hidden) return;
+  if (d.contains(document.activeElement)) document.getElementById('menuBtn').focus({preventScroll:true});
   d.classList.remove('open'); s.classList.remove('open');
   document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
   document.body.style.overflow = '';
@@ -539,7 +508,16 @@ document.getElementById('drawer').addEventListener('click', e => {
   ARTPREF = v; const changed = v !== ARTSTYLE; ARTSTYLE = v; try { localStorage.setItem('hk-art2', v); } catch (err) {}
   if (changed) { BG_TRIP = null; show(); } else renderNav((location.hash || '#overview').slice(1));
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeMenu(); return; }
+  if (e.key !== 'Tab') return;
+  const d = document.getElementById('drawer'); if (d.hidden || !d.classList.contains('open')) return;
+  const f = Array.from(d.querySelectorAll('a[href],button')); if (!f.length) return;
+  const first = f[0], last = f[f.length - 1], act = document.activeElement;
+  if (!d.contains(act)) { e.preventDefault(); first.focus(); }
+  else if (e.shiftKey && act === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && act === last) { e.preventDefault(); first.focus(); }
+});
 
 /* world map */
 const WM = { W:360, top:120, gap:104, xs:[96,262,286,150,74,210,292,168,70,214] };
@@ -685,7 +663,6 @@ async function playAll(){
   try {
     if (!await landing(tok)) return;
     for (let i = 0; i <= 10; i++) {
-      const tgt = el('seg' + i); if (tgt && i > 0) { const [x,y] = nodeXY(i); }
       if (!await walkSeg(i, tok)) return;
       if (i < 10) { if (!await sleep(220, tok)) return; }
     }
@@ -787,7 +764,7 @@ const CATS = [['餐飲','var(--rose)'],['交通','var(--blue)'],['滑雪','var(-
 const CATC = Object.fromEntries(CATS);
 const WHO = [['浣熊','var(--plum)'],['蕭','var(--blue)'],['君','var(--rose)']];
 const PEOPLE = WHO.map(w => w[0]);
-const L = { list: [], rate: 0.205, rateTs: 0, rateSrc: '預設', mode: 'local', canWrite: true, db: null, cur: 'JPY', cat: '餐飲', who: '', split: PEOPLE.slice(), smode: 'even', editing: null };
+const L = { list: [], rate: 0.205, rateTs: 0, rateSrc: '預設', mode: 'local', backend: null, shared: false, cur: 'JPY', cat: '餐飲', who: '', split: PEOPLE.slice(), smode: 'even', editing: null };
 function loadLocal(){ try { L.list = JSON.parse(localStorage.getItem('hk-ledger') || '[]') || []; } catch (e) { L.list = []; } }
 function saveLocal(){ try { localStorage.setItem('hk-ledger', JSON.stringify(L.list)); } catch (e) {} }
 loadLocal();
@@ -796,7 +773,23 @@ function toTWD(e){ return e.cur === 'TWD' ? e.amount : e.amount * L.rate; }
 function toJPY(e){ return e.cur === 'TWD' ? e.amount / L.rate : e.amount; }
 try { const r = JSON.parse(localStorage.getItem('hk-rate2') || 'null'); if (r && r.rate > 0 && r.rate < 5) { L.rate = r.rate; L.rateTs = r.ts || 0; L.rateSrc = r.src || ''; } } catch (e) {}
 function saveRate(){ try { localStorage.setItem('hk-rate2', JSON.stringify({ rate: L.rate, ts: L.rateTs, src: L.rateSrc })); } catch (e) {} }
-function rateNote(){ if (!L.rateTs) return '尚未自動更新，先用預設值'; const d = new Date(L.rateTs); return L.rateSrc + '・' + (d.getMonth()+1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+function setRateLocal(rate, src, ts){
+  L.rate = rate; L.rateTs = ts || Date.now(); L.rateSrc = src; saveRate();
+  const inp = document.getElementById('f-rate'); if (inp) inp.value = L.rate;
+  const n = document.getElementById('ratenote'); if (n) n.textContent = rateNote();
+  renderLedger();
+}
+/* 手動輸入或「自動帶入」：已連線時寫到 Firestore，三支手機一起用同一個匯率 */
+function commitRate(rate, src){
+  if (L.mode === 'db' && L.backend && L.backend.setRate) L.backend.setRate(rate);
+  setRateLocal(rate, src);
+}
+function applyShared(snap){
+  const d = snap.exists() ? snap.data() : null;
+  if (d && d.rate > 0 && d.rate < 5) { L.shared = true; setRateLocal(Number(d.rate), '共用', d.ts); }
+  else { L.shared = false; if (L.rateSrc === '共用') { L.rateSrc = '手動'; saveRate(); } updateSync(); }
+}
+function rateNote(){ if (!L.rateTs) return '尚未自動更新，先用預設值'; const d = new Date(L.rateTs); return (L.rateSrc === '共用' ? '三人共用' : L.rateSrc) + '・' + (d.getMonth()+1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
 async function fetchRate(manual){
   const note = document.getElementById('ratenote'); if (note && manual) note.textContent = '更新中…';
   const tries = [
@@ -804,7 +797,7 @@ async function fetchRate(manual){
     ['https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/jpy.json', j => j && j.jpy && j.jpy.twd]
   ];
   for (const [u, pick] of tries) {
-    try { const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) continue; const v = Number(pick(await r.json())); if (v > 0 && v < 5) { L.rate = Math.round(v * 10000) / 10000; L.rateTs = Date.now(); L.rateSrc = '自動'; saveRate(); const inp = document.getElementById('f-rate'); if (inp) inp.value = L.rate; renderLedger(); return true; } } catch (e) {}
+    try { const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) continue; const v = Number(pick(await r.json())); if (v > 0 && v < 5) { const rate = Math.round(v * 10000) / 10000; if (manual) commitRate(rate, '自動'); else if (!L.shared) setRateLocal(rate, '自動'); return true; } } catch (e) {}
   }
   if (note) note.textContent = '無法取得最新匯率，維持 ' + L.rate + '（' + rateNote() + '）';
   return false;
@@ -815,21 +808,19 @@ function splitOf(e){ if (hasShares(e)) return PEOPLE.filter(p => Number(e.shares
 function chips(kind, list, isOn){ return list.map(([n,c]) => '<button type="button" data-' + kind + '="' + n + '" style="--c:' + c + '" aria-pressed="' + isOn(n) + '">' + n + '</button>').join(''); }
 
 function renderLedgerShell(){
-  let h = '';
-  if (L.canWrite) {
-    h += '<form class="addform' + (L.editing ? ' editing' : '') + '" id="addform" autocomplete="off" novalidate>';
-    h += '<div class="editbar" id="editbar"' + (L.editing ? '' : ' hidden') + '><span>正在修改這一筆</span><button type="button" id="cancelEdit">取消修改</button></div>';
-    h += '<div><label for="f-amt">金額</label><div class="f-amt"><input id="f-amt" inputmode="decimal" placeholder="0" aria-label="金額"><div class="seg" role="group" aria-label="幣別"><button type="button" data-cur="JPY" aria-pressed="' + (L.cur==='JPY') + '">円</button><button type="button" data-cur="TWD" aria-pressed="' + (L.cur==='TWD') + '">NT$</button></div></div></div>';
-    h += '<div><label>類別</label><div class="chips" role="group" aria-label="類別">' + chips('cat', CATS, n => L.cat === n) + '</div></div>';
-    h += '<div><label for="f-item">項目</label><input id="f-item" placeholder="例如：雪風味噌拉麵" maxlength="40"></div>';
-    h += '<div><label for="f-day">哪一天</label><select id="f-day">' + DAYS.map(d => '<option value="' + d.n + '"' + (defaultDay()===String(d.n)?' selected':'') + '>Day ' + d.n + '・' + md(d) + '</option>').join('') + '<option value="0"' + (defaultDay()==='0'?' selected':'') + '>行前／其他</option></select></div>';
-    h += '<div><label>誰先付的</label><div class="chips" role="group" aria-label="誰先付的">' + chips('who', WHO, n => L.who === n) + '</div></div>';
-    h += '<div><label>怎麼分攤</label><div class="seg seg2" role="group" aria-label="分攤方式"><button type="button" data-smode="even" aria-pressed="' + (L.smode==='even') + '">平均分攤</button><button type="button" data-smode="custom" aria-pressed="' + (L.smode==='custom') + '">自訂金額</button></div>';
-    h += '<div class="chips" id="splitchips" role="group" aria-label="誰要分攤"' + (L.smode==='custom' ? ' hidden' : '') + '>' + chips('split', WHO, n => L.split.includes(n)) + '</div>';
-    h += '<div class="shares" id="shares"' + (L.smode==='custom' ? '' : ' hidden') + '>' + PEOPLE.map(p => '<label class="sh"><span>' + p + '</span><input inputmode="decimal" data-share="' + p + '" placeholder="0" aria-label="' + p + ' 分攤金額"></label>').join('') + '<div class="shnote" id="shnote">每個人要分攤的金額，加起來要等於上面的金額</div></div></div>';
-    h += '<button class="addbtn" id="addbtn" type="submit">' + (L.editing ? '儲存修改' : '記一筆') + '</button><div class="msg" id="msg" role="status"></div></form>';
-  }
-  h += '<details class="fold mfold"><summary>分帳結算<small id="settlesum"></small></summary><div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><button type="button" class="ratebtn" id="rateBtn">自動帶入</button><span class="ratenote" id="ratenote">' + rateNote() + '</span></div><div id="settle"></div></details>';
+  let h = '<div class="sync" id="sync"><i></i><span></span></div>';
+  h += '<form class="addform' + (L.editing ? ' editing' : '') + '" id="addform" autocomplete="off" novalidate>';
+  h += '<div class="editbar" id="editbar"' + (L.editing ? '' : ' hidden') + '><span>正在修改這一筆</span><button type="button" id="cancelEdit">取消修改</button></div>';
+  h += '<div><label for="f-amt">金額</label><div class="f-amt"><input id="f-amt" inputmode="decimal" placeholder="0" aria-label="金額"><div class="seg" role="group" aria-label="幣別"><button type="button" data-cur="JPY" aria-pressed="' + (L.cur==='JPY') + '">円</button><button type="button" data-cur="TWD" aria-pressed="' + (L.cur==='TWD') + '">NT$</button></div></div></div>';
+  h += '<div><label>類別</label><div class="chips" role="group" aria-label="類別">' + chips('cat', CATS, n => L.cat === n) + '</div></div>';
+  h += '<div><label for="f-item">項目</label><input id="f-item" placeholder="例如：雪風味噌拉麵" maxlength="40"></div>';
+  h += '<div><label for="f-day">哪一天</label><select id="f-day">' + DAYS.map(d => '<option value="' + d.n + '"' + (defaultDay()===String(d.n)?' selected':'') + '>Day ' + d.n + '・' + md(d) + '</option>').join('') + '<option value="0"' + (defaultDay()==='0'?' selected':'') + '>行前／其他</option></select></div>';
+  h += '<div><label>誰先付的</label><div class="chips" role="group" aria-label="誰先付的">' + chips('who', WHO, n => L.who === n) + '</div></div>';
+  h += '<div><label>怎麼分攤</label><div class="seg seg2" role="group" aria-label="分攤方式"><button type="button" data-smode="even" aria-pressed="' + (L.smode==='even') + '">平均分攤</button><button type="button" data-smode="custom" aria-pressed="' + (L.smode==='custom') + '">自訂金額</button></div>';
+  h += '<div class="chips" id="splitchips" role="group" aria-label="誰要分攤"' + (L.smode==='custom' ? ' hidden' : '') + '>' + chips('split', WHO, n => L.split.includes(n)) + '</div>';
+  h += '<div class="shares" id="shares"' + (L.smode==='custom' ? '' : ' hidden') + '>' + PEOPLE.map(p => '<label class="sh"><span>' + p + '</span><input inputmode="decimal" data-share="' + p + '" placeholder="0" aria-label="' + p + ' 分攤金額"></label>').join('') + '<div class="shnote" id="shnote">每個人要分攤的金額，加起來要等於上面的金額</div></div></div>';
+  h += '<button class="addbtn" id="addbtn" type="submit">' + (L.editing ? '儲存修改' : '記一筆') + '</button><div class="msg" id="msg" role="status"></div></form>';
+  h += '<details class="fold mfold"><summary>分帳結算<small id="settlesum"></small></summary><div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><button type="button" class="ratebtn" id="rateBtn">自動帶入</button><span class="ratenote" id="ratenote">' + rateNote() + '</span></div><p class="stlnote" id="ratehint"></p><div id="settle"></div></details>';
   h += '<details class="fold mfold"><summary>花費分類</summary><div id="bars"></div></details>';
   h += '<details class="fold mfold ledfold"><summary>明細<small id="ledsum"></small></summary><p class="h2note in">點一筆可以修改</p><div id="spent"></div><div id="ledger"></div></details>';
   return h;
@@ -858,7 +849,7 @@ function renderLedger(){
   const max = Math.max(1, ...Object.values(byCat));
   document.getElementById('bars').innerHTML = list.length ? chartHTML(list, byCat) : '<div class="empty">還沒有記錄，記下第一筆吧</div>';
   renderSettle(list);
-  const groups = {}; for (const e of list) (groups[e.day] = groups[e.day] || []).push(e);
+  const groups = {}; for (const e of list) { const k = Number(e.day) || 0; (groups[k] = groups[k] || []).push(e); }
   const order = Object.keys(groups).map(Number).sort((a,b) => (b||99) - (a||99));
   let h = '';
   for (const k of order) {
@@ -869,15 +860,16 @@ function renderLedger(){
     for (const e of g) {
       const sp2 = splitOf(e), partial = sp2.length < PEOPLE.length;
       h += '<div class="e' + (L.editing === e.id ? ' on' : '') + '"><span class="dot" style="background:' + (CATC[e.cat] || 'var(--muted)') + '"></span>';
-      h += (L.canWrite ? '<button type="button" class="nm" data-edit="' + esc(e.id) + '" aria-label="修改 ' + esc(e.item || e.cat) + '">' : '<span class="nm">') + esc(e.item || e.cat) + '<small>' + esc(e.cat) + (e.who ? '・' + esc(e.who) + ' 付' : '') + (hasShares(e) ? '・自訂 ' + PEOPLE.filter(p => Number(e.shares[p]) > 0).map(p => p + ' ' + fmt(e.shares[p])).join('、') : partial ? '・' + sp2.join('、') + ' 分' : '') + (e._pending ? '・<em>待上傳</em>' : '') + '</small>' + (L.canWrite ? '</button>' : '</span>');
+      h += '<button type="button" class="nm" data-edit="' + esc(e.id) + '" aria-label="修改 ' + esc(e.item || e.cat) + '">' + esc(e.item || e.cat) + '<small>' + esc(e.cat) + (e.who ? '・' + esc(e.who) + ' 付' : '') + (hasShares(e) ? '・自訂 ' + PEOPLE.filter(p => Number(e.shares[p]) > 0).map(p => p + ' ' + fmt(e.shares[p])).join('、') : partial ? '・' + sp2.join('、') + ' 分' : '') + (e._pending ? '・<em>待上傳</em>' : '') + '</small></button>';
       h += '<span class="am">' + (e.cur === 'TWD' ? 'NT$ ' + fmt(e.amount) : fmt(e.amount) + ' 円') + '</span>';
-      h += L.canWrite ? '<button class="del" type="button" data-id="' + esc(e.id) + '" aria-label="刪除 ' + esc(e.item || e.cat) + '">×</button>' : '<span></span>';
+      h += '<button class="del" type="button" data-id="' + esc(e.id) + '" aria-label="刪除 ' + esc(e.item || e.cat) + '">×</button>';
       h += '</div>';
     }
     h += '</li>';
   }
   document.getElementById('ledger').innerHTML = list.length ? '<ul class="ledger">' + h + '</ul>' : '';
   const ls = document.getElementById('ledsum'); if (ls) ls.textContent = list.length ? '共 ' + list.length + ' 筆・NT$ ' + fmt(all) : '';
+  updateSync();
 }
 function renderSettle(list){
   const box = document.getElementById('settle'); if (!box) return;
@@ -1006,7 +998,7 @@ document.getElementById('view').addEventListener('submit', async ev => {
   try {
     const editing = L.editing;
     if (editing) { await updateEntry(editing, e); endEdit(); } else { await addEntry(e); document.getElementById('f-amt').value = ''; document.getElementById('f-item').value = ''; }
-    msg.style.color = 'var(--sage)'; msg.textContent = editing ? '已修改' : '已記下';
+    msg.style.color = 'var(--sage-t)'; msg.textContent = editing ? '已修改' : '已記下';
     setTimeout(() => { if (/^已(記下|修改)$/.test(msg.textContent)) { msg.textContent = ''; msg.style.color = ''; } }, 1600);
   } catch (err) { writeFailed(); } finally { btn.disabled = false; }
 });
@@ -1014,54 +1006,48 @@ document.getElementById('view').addEventListener('input', ev => { if (ev.target.
 document.getElementById('view').addEventListener('change', ev => {
   if (ev.target.id !== 'f-rate') return;
   const r = Number(ev.target.value); if (!(r > 0 && r < 5)) { ev.target.value = L.rate; return; }
-  L.rate = r; L.rateTs = Date.now(); L.rateSrc = '手動'; saveRate();
-  const n = document.getElementById('ratenote'); if (n) n.textContent = rateNote();
-  renderLedger();
+  commitRate(r, '手動');
 });
+let ledgerStarted = false;
+function startLedger(){ if (ledgerStarted) return; ledgerStarted = true; connectFirebase(); }
+function updateSync(){
+  const el = document.getElementById('sync'); if (!el) return;
+  const live = L.mode === 'db', wait = L.mode === 'wait';
+  el.className = 'sync' + (live ? ' live' : wait ? ' wait' : '');
+  el.lastElementChild.textContent = live ? '已連線・三人即時同步' : wait ? '連線中…' : FIREBASE_CONFIG ? '未連線・目前只存在這支手機' : '未啟用雲端同步・只存在這支手機';
+  const h = document.getElementById('ratehint');
+  if (h) h.textContent = !live ? '尚未連線，匯率只存在這支手機，三個人看到的金額可能不一樣。'
+    : L.shared ? '三人共用這個匯率。要改的話輸入新匯率或按「自動帶入」，三個人會一起更新。'
+    : '最後結算時，由一個人按「自動帶入」或輸入匯率，三個人就會看到同一個匯率與同一組轉帳金額。';
+}
 async function connectFirebase(){
   if (!FIREBASE_CONFIG) return;
   L.mode = 'wait'; renderLedger();
   const timer = setTimeout(() => { if (L.mode === 'wait') { L.mode = 'local'; loadLocal(); renderLedger(); } }, 15000);
   try {
-    const app = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const FB = 'https://www.gstatic.com/firebasejs/12.19.0/';
+    const app = await import(FB + 'firebase-app.js');
+    const fs = await import(FB + 'firebase-firestore.js');
     const fbApp = app.initializeApp(FIREBASE_CONFIG);
     let db;
     try { db = fs.initializeFirestore(fbApp, { localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }) }); }
     catch (e) { db = fs.getFirestore(fbApp); }
     const col = fs.collection(db, 'trips', TRIP_ID, 'expenses');
+    const rateRef = fs.doc(db, 'trips', TRIP_ID, 'meta', 'rate');
     const clean = e => { const o = Object.assign({}, e); delete o._pending; return o; };
     L.backend = {
       add: e => { const ref = fs.doc(col); e.id = ref.id; fs.setDoc(ref, clean(e)).catch(writeFailed); },
       set: (id, e) => { e.id = id; fs.setDoc(fs.doc(col, id), clean(e)).catch(writeFailed); },
-      del: id => { fs.deleteDoc(fs.doc(col, id)).catch(writeFailed); }
+      del: id => { fs.deleteDoc(fs.doc(col, id)).catch(writeFailed); },
+      setRate: r => { fs.setDoc(rateRef, { rate: r, ts: Date.now() }).catch(() => { const n = document.getElementById('ratenote'); if (n) n.textContent = '匯率沒能存到雲端，目前只套用在這支手機'; }); }
     };
+    fs.onSnapshot(rateRef, applyShared, () => {});
     fs.onSnapshot(col, { includeMetadataChanges: true }, snap => {
       clearTimeout(timer); L.mode = 'db';
       L.list = snap.docs.map(d => Object.assign({}, d.data(), { id: d.id, _pending: d.metadata.hasPendingWrites })).filter(e => typeof e.amount === 'number' && e.amount > 0);
       renderLedger();
     }, () => { clearTimeout(timer); L.mode = 'local'; L.backend = null; loadLocal(); renderLedger(); });
   } catch (e) { clearTimeout(timer); L.mode = 'local'; L.backend = null; renderLedger(); }
-}
-
-async function connectDb(){
-  if (!window.claude || typeof window.claude.use !== 'function') return connectFirebase();
-  L.mode = 'wait'; renderLedger();
-  const timer = setTimeout(() => { if (L.mode === 'wait') { L.mode = 'local'; loadLocal(); renderLedger(); } }, 10000);
-  let db = null;
-  try { db = await window.claude.use('db'); } catch (e) { db = null; }
-  if (!db) { clearTimeout(timer); L.mode = 'local'; renderLedger(); return connectFirebase(); }
-  try { const user = await window.claude.use('user'); const w = user ? await user.can('data.write') : null; if (w === false) L.canWrite = false; } catch (e) {}
-  L.db = db;
-  L.backend = { add: async e => { const ref = db.collection('expenses').doc(); e.id = ref.id; const o = Object.assign({}, e); delete o._pending; await ref.set(o); }, set: async (id, e) => { e.id = id; const o = Object.assign({}, e); delete o._pending; await db.collection('expenses').doc(id).set(o); }, del: id => db.collection('expenses').doc(id).delete() };
-  db.collection('expenses').onSnapshot(snap => {
-    clearTimeout(timer);
-    L.mode = 'db';
-    L.list = snap.docs.map(d => Object.assign({}, d.data(), { id: d.id })).filter(e => typeof e.amount === 'number' && e.amount > 0);
-    const wasWrite = !!document.getElementById('addform');
-    if (!L.canWrite && wasWrite) { show(); return; }
-    renderLedger();
-  }, () => { clearTimeout(timer); L.mode = 'local'; L.db = null; L.backend = null; loadLocal(); renderLedger(); });
 }
 
 function show(){
@@ -1075,7 +1061,7 @@ function show(){
   view.innerHTML = id === 'overview' ? renderOverview() : id === 'cost' ? renderCost() : id === 'ishigaki' ? renderIshigaki() : renderDay(DAYS[Number(id.slice(3)) - 1]);
   renderNav(id); window.scrollTo(0, 0);
   ANIM++;
-  if (id === 'cost') { renderLedger(); if (L.rateSrc !== '手動' && (Date.now() - L.rateTs > 6 * 3600000 || L.rateSrc === '預設')) fetchRate(false).then(ok => { const n = document.getElementById('ratenote'); if (ok && n) n.textContent = rateNote(); }); }
+  if (id === 'cost') { startLedger(); renderLedger(); if (!L.shared && L.rateSrc !== '手動' && (Date.now() - L.rateTs > 6 * 3600000 || L.rateSrc === '預設')) fetchRate(false).then(ok => { const n = document.getElementById('ratenote'); if (ok && n) n.textContent = rateNote(); }); }
   if (id === 'overview') { requestAnimationFrame(() => playToday()); const pb = el('playbtn'); if (pb) pb.addEventListener('click', playAll); }
 }
 document.getElementById('view').addEventListener('click', e => {
@@ -1091,7 +1077,6 @@ document.getElementById('todayBtn').addEventListener('click', () => {
 });
 window.addEventListener('hashchange', show);
 show();
-connectDb();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
