@@ -821,8 +821,8 @@ function renderLedgerShell(){
   h += '<div class="shares" id="shares"' + (L.smode==='custom' ? '' : ' hidden') + '>' + PEOPLE.map(p => '<label class="sh"><span>' + p + '</span><input inputmode="decimal" data-share="' + p + '" placeholder="0" aria-label="' + p + ' 分攤金額"></label>').join('') + '<div class="shnote" id="shnote">每個人要分攤的金額，加起來要等於上面的金額</div></div></div>';
   h += '<button class="addbtn" id="addbtn" type="submit">' + (L.editing ? '儲存修改' : '記一筆') + '</button><div class="msg" id="msg" role="status"></div></form>';
   h += '<details class="fold mfold"><summary>分帳結算<small id="settlesum"></small></summary><div class="rate"><label for="f-rate">匯率　1 円 ＝ NT$</label><input id="f-rate" inputmode="decimal" value="' + L.rate + '"><button type="button" class="ratebtn" id="rateBtn">自動帶入</button><span class="ratenote" id="ratenote">' + rateNote() + '</span></div><p class="stlnote" id="ratehint"></p><div id="settle"></div></details>';
-  h += '<details class="fold mfold"><summary>花費分類</summary><div id="bars"></div></details>';
   h += '<details class="fold mfold ledfold"><summary>明細<small id="ledsum"></small></summary><p class="h2note in">點一筆可以修改</p><div id="spent"></div><div id="ledger"></div></details>';
+  h += '<details class="fold mfold"><summary>花費分類</summary><div id="bars"></div></details>';
   return h;
 }
 function chartHTML(list, byCat){
