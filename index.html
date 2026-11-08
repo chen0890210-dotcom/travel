@@ -314,6 +314,26 @@ body[data-trip="ishigaki"] .bgart img{opacity:.3}
 .legend2 i{width:10px;height:10px;border-radius:50%}
 .legend2 b{font-family:var(--type);font-weight:700;text-align:right}
 .legend2 em{grid-column:2 / -1;font-style:normal;font-family:var(--type);font-size:12px;color:var(--muted)}
+.settlebtn{flex:none;border:1px solid var(--ink);background:var(--paper);border-radius:999px;padding:2px 10px;font:inherit;font-size:13px;cursor:pointer;min-height:32px;margin-left:6px}
+.settlebtn.armed{background:var(--sage);border-color:var(--sage);color:#fff}
+.xfer div{flex-wrap:wrap}
+.ledger .e.settled{border-style:dashed}
+.ledger .e.settled .nm{cursor:default}
+.wx{margin:12px 18px 0;padding:12px 14px;background:var(--paper);border:1px solid var(--line);border-radius:4px}
+.wx-main{display:flex;align-items:center;gap:12px}
+.wx-ic{font-size:38px;line-height:1}
+.wx-tx{font-size:17px;font-weight:700}
+.wx-tx small{font-weight:400;font-size:12.5px;color:var(--muted);margin-left:8px}
+.wx-t{font-family:var(--type);font-size:15px;color:var(--muted)}
+.wx-t b{font-size:20px;color:var(--ink)}
+.wx-meta{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:6px;font-size:14px;color:var(--muted)}
+.wx-meta b{font-family:var(--type);color:var(--ink)}
+.wx-src{margin-top:4px;font-size:11.5px;color:var(--muted)}
+.wx-na{font-size:14px;color:var(--muted)}
+.wx-na b{color:var(--ink);margin-right:8px}
+.snowlinks{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px}
+.snowlinks span{color:var(--muted);margin-right:2px}
+.snowlinks a{text-decoration:none;border:1px solid var(--ink);border-radius:999px;padding:3px 10px;min-height:32px;display:inline-flex;align-items:center}
 /* folds */
 .fold{margin:20px 18px 0;background:var(--paper);border:1px solid var(--line);border-radius:4px}
 .fold summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:baseline;gap:10px;font-size:15.5px;letter-spacing:.1em}
@@ -643,12 +663,71 @@ function renderOverview(){
   return h;
 }
 
+const WX_LOC = {
+  sapporo: { name: '札幌市區', lat: 43.0618, lon: 141.3545 },
+  kokusai: { name: '札幌國際滑雪場', lat: 43.0745, lon: 141.1086 },
+  furano: { name: '富良野', lat: 43.3420, lon: 142.3830 },
+  furanoski: { name: '富良野滑雪場', lat: 43.3290, lon: 142.3480 },
+  otaru: { name: '小樽', lat: 43.1907, lon: 140.9947 },
+  chitose: { name: '新千歲機場', lat: 42.7752, lon: 141.6923 }
+};
+const DAY_WX = { 1: 'sapporo', 2: 'kokusai', 3: 'kokusai', 4: 'kokusai', 5: 'furano', 6: 'furanoski', 7: 'furanoski', 8: 'furanoski', 9: 'otaru', 10: 'chitose' };
+const SNOW_LINKS = {
+  kokusai: [['即時影像', 'https://www.sapporo-kokusai.jp/live.php'], ['天氣・積雪', 'https://weathernews.jp/ski/spot/31403/'], ['雪場回報', 'https://weathernews.jp/ski/report/31403.html']],
+  furanoski: [['即時影像', 'https://www.princehotels.co.jp/ski/furano/livecamera/'], ['天氣・積雪', 'https://weathernews.jp/ski/spot/31602/'], ['雪場回報', 'https://weathernews.jp/ski/report/31602.html']]
+};
+function wxInfo(c){
+  if (c === 0) return ['☀️', '晴天']; if (c <= 2) return ['🌤️', '晴時多雲']; if (c === 3) return ['☁️', '陰天']; if (c <= 48) return ['🌫️', '有霧'];
+  if (c <= 57) return ['🌦️', '毛毛雨']; if (c <= 67) return ['🌧️', '下雨']; if (c === 71) return ['🌨️', '小雪']; if (c === 73) return ['🌨️', '下雪']; if (c === 75) return ['❄️', '大雪']; if (c === 77) return ['🌨️', '細雪'];
+  if (c <= 82) return ['🌦️', '陣雨']; if (c <= 86) return ['🌨️', '陣雪']; return ['⛈️', '雷雨'];
+}
+let WX = null; try { WX = JSON.parse(localStorage.getItem('hk-wx') || 'null'); } catch (e) {}
+let WX_LOADING = null;
+function loadWeather(){
+  if (WX && Date.now() - WX.ts < 3 * 3600000) return Promise.resolve(WX);
+  if (WX_LOADING) return WX_LOADING;
+  const keys = Object.keys(WX_LOC);
+  const u = 'https://api.open-meteo.com/v1/forecast?latitude=' + keys.map(k => WX_LOC[k].lat).join(',') + '&longitude=' + keys.map(k => WX_LOC[k].lon).join(',') + '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,snowfall_sum&timezone=Asia%2FTokyo&forecast_days=16';
+  WX_LOADING = fetch(u).then(r => r.ok ? r.json() : Promise.reject(r.status)).then(j => {
+    const arr = Array.isArray(j) ? j : [j], data = {};
+    keys.forEach((k, i) => { const d = arr[i] && arr[i].daily; if (d) data[k] = d; });
+    WX = { ts: Date.now(), data }; try { localStorage.setItem('hk-wx', JSON.stringify(WX)); } catch (e) {}
+    return WX;
+  }).catch(() => WX).finally(() => { WX_LOADING = null; });
+  return WX_LOADING;
+}
+function wxCard(d){
+  const loc = DAY_WX[d.n]; if (!loc) return '';
+  const links = SNOW_LINKS[loc] ? '<div class="snowlinks"><span>雪況</span>' + SNOW_LINKS[loc].map(([t, u]) => '<a href="' + u + '" target="_blank" rel="noopener">' + t + ' ↗</a>').join('') + '</div>' : '';
+  return '<section class="wx" id="wxcard" data-day="' + d.n + '"><div class="wx-body" id="wxbody">天氣預報讀取中…</div>' + links + '</section>';
+}
+function fillWeather(n){
+  const box = document.getElementById('wxbody'); if (!box) return;
+  const d = DAYS[n - 1], loc = DAY_WX[n], L0 = WX_LOC[loc];
+  const daysAway = Math.round((dayDate(d) - today0()) / 86400000);
+  const render = w => {
+    const b = document.getElementById('wxbody'); if (!b || Number(document.getElementById('wxcard').dataset.day) !== n) return;
+    const dd = w && w.data && w.data[loc], i = dd ? dd.time.indexOf(d.date) : -1;
+    if (daysAway < 0 && i < 0) { b.innerHTML = '<div class="wx-na">' + L0.name + '・這天已經過了</div>'; return; }
+    if (i < 0) {
+      if (daysAway > 15) { const op = new Date(dayDate(d).getTime() - 15 * 86400000); b.innerHTML = '<div class="wx-na"><b>' + L0.name + '天氣</b>預報會在 ' + (op.getMonth() + 1) + '/' + op.getDate() + ' 起提供（出發前約兩週）</div>'; }
+      else b.innerHTML = '<div class="wx-na"><b>' + L0.name + '天氣</b>' + (navigator.onLine ? '暫時拿不到預報，稍後再試' : '目前離線，有網路時會自動更新') + '</div>';
+      return;
+    }
+    const [ic, tx] = wxInfo(dd.weather_code[i]), hi = Math.round(dd.temperature_2m_max[i]), lo = Math.round(dd.temperature_2m_min[i]), pp = dd.precipitation_probability_max[i], sn = dd.snowfall_sum[i];
+    const t = new Date(w.ts);
+    b.innerHTML = '<div class="wx-main"><span class="wx-ic" aria-hidden="true">' + ic + '</span><div><div class="wx-tx">' + tx + '<small>' + L0.name + '</small></div><div class="wx-t"><b>' + hi + '°</b> / ' + lo + '°C</div></div></div><div class="wx-meta">' + (pp != null ? '<span>降水機率 <b>' + pp + '%</b></span>' : '') + (sn > 0 ? '<span>降雪 <b>' + (Math.round(sn * 10) / 10) + ' cm</b></span>' : '') + '</div><div class="wx-src">Open-Meteo 預報・' + (t.getMonth() + 1) + '/' + t.getDate() + ' ' + String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') + ' 更新</div>';
+  };
+  if (daysAway > 15) { render(null); return; }
+  render(WX); loadWeather().then(render);
+}
 function renderDay(d){
   const t = dayDate(d), c = C[d.n-1];
   let h = '<section class="stagehead" style="--c:' + c + '"><div class="kicker"><b>STAGE ' + String(d.n).padStart(2,'0') + '</b> / 10　' + md(d) + '（' + WEEK[t.getDay()] + '）</div>';
   h += '<h1>' + esc(d.title) + '</h1><div class="route">' + I('flag') + esc(d.sub) + '</div><div class="pips">';
   for (const x of DAYS) h += '<a href="#day' + x.n + '" aria-label="Stage ' + x.n + '" class="' + (x.n === d.n ? 'cur' : x.n < d.n ? 'past' : '') + '"></a>';
   h += '</div></section>';
+  h += wxCard(d);
   h += '<ol class="trail" style="--c:' + c + '">';
   d.items.forEach(it => {
     if (it.t) {
@@ -807,21 +886,28 @@ function renderLedger(){
   const sp = document.getElementById('spent'); if (!sp) return;
   const list = L.list;
   let jpy = 0, twd = 0, all = 0, pend = 0;
-  for (const e of list) { if (e.cur === 'TWD') twd += e.amount; else jpy += e.amount; if (e._pending) pend++; }
+  const spend = list.filter(e => e.cat !== '結清');
+  for (const e of spend) { if (e.cur === 'TWD') twd += e.amount; else jpy += e.amount; }
+  for (const e of list) if (e._pending) pend++;
   all = jpy * L.rate + twd;
-  sp.innerHTML = '<div class="spent"><div class="k">TOTAL SPENT</div><div class="cols"><div><small>日幣</small><b>' + fmt(jpy) + ' 円</b></div><div><small>台幣</small><b>NT$ ' + fmt(twd) + '</b></div><div class="sum"><small>總計（台幣）</small><b>NT$ ' + fmt(all) + '</b></div></div><div class="row"><span>每人平均 <b>NT$ ' + fmt(all/3) + '</b></span><span>共 <b>' + list.length + '</b> 筆</span><span>匯率 <b>' + L.rate + '</b></span></div>' + (pend ? '<div class="pend">有 ' + pend + ' 筆等網路恢復後自動上傳</div>' : '') + '</div>';
-  const byCat = {}; for (const e of list) byCat[e.cat] = (byCat[e.cat] || 0) + toTWD(e);
-  document.getElementById('bars').innerHTML = list.length ? chartHTML(list, byCat) : '<div class="empty">還沒有記錄，記下第一筆吧</div>';
+  sp.innerHTML = '<div class="spent"><div class="k">TOTAL SPENT</div><div class="cols"><div><small>日幣</small><b>' + fmt(jpy) + ' 円</b></div><div><small>台幣</small><b>NT$ ' + fmt(twd) + '</b></div><div class="sum"><small>總計（台幣）</small><b>NT$ ' + fmt(all) + '</b></div></div><div class="row"><span>每人平均 <b>NT$ ' + fmt(all/3) + '</b></span><span>共 <b>' + spend.length + '</b> 筆</span><span>匯率 <b>' + L.rate + '</b></span></div>' + (pend ? '<div class="pend">有 ' + pend + ' 筆等網路恢復後自動上傳</div>' : '') + '</div>';
+  const byCat = {}; for (const e of spend) byCat[e.cat] = (byCat[e.cat] || 0) + toTWD(e);
+  document.getElementById('bars').innerHTML = spend.length ? chartHTML(spend, byCat) : '<div class="empty">還沒有記錄，記下第一筆吧</div>';
   renderSettle(list);
   const groups = {}; for (const e of list) { const k = Number(e.day) || 0; (groups[k] = groups[k] || []).push(e); }
   const order = Object.keys(groups).map(Number).sort((a,b) => (b||99) - (a||99));
   let h = '';
   for (const k of order) {
     const g = groups[k].sort((a,b) => (b.ts||0) - (a.ts||0));
-    const sj = g.reduce((s,e) => s + (e.cur === 'TWD' ? 0 : e.amount), 0), st = g.reduce((s,e) => s + (e.cur === 'TWD' ? e.amount : 0), 0);
+    const gs = g.filter(e => e.cat !== '結清'), sj = gs.reduce((s,e) => s + (e.cur === 'TWD' ? 0 : e.amount), 0), st = gs.reduce((s,e) => s + (e.cur === 'TWD' ? e.amount : 0), 0);
     const d = DAYS[k-1];
     h += '<li><div class="dh"><span>' + (d ? 'DAY ' + k + '・' + md(d) : '行前／其他') + '</span><span>' + [sj ? fmt(sj) + ' 円' : '', st ? 'NT$ ' + fmt(st) : ''].filter(Boolean).join('＋') + '</span></div>';
     for (const e of g) {
+      if (e.cat === '結清') {
+        const to = PEOPLE.find(p => e.shares && Number(e.shares[p]) > 0) || '';
+        h += '<div class="e settled"><span class="dot" style="background:var(--sage)"></span><span class="nm">已結清<small>' + esc(e.who) + ' 付給 ' + esc(to) + (e._pending ? '・<em>待上傳</em>' : '') + '</small></span><span class="am">' + (e.cur === 'TWD' ? 'NT$ ' + fmt(e.amount) : fmt(e.amount) + ' 円') + '</span><button class="del" type="button" data-id="' + esc(e.id) + '" aria-label="取消這筆結清">×</button></div>';
+        continue;
+      }
       const sp2 = splitOf(e), partial = sp2.length < PEOPLE.length;
       h += '<div class="e' + (L.editing === e.id ? ' on' : '') + '"><span class="dot" style="background:' + (CATC[e.cat] || 'var(--muted)') + '"></span>';
       h += '<button type="button" class="nm" data-edit="' + esc(e.id) + '" aria-label="修改 ' + esc(e.item || e.cat) + '">' + esc(e.item || e.cat) + '<small>' + esc(e.cat) + (e.who ? '・' + esc(e.who) + ' 付' : '') + (hasShares(e) ? '・自訂 ' + PEOPLE.filter(p => Number(e.shares[p]) > 0).map(p => p + ' ' + fmt(e.shares[p])).join('、') : partial ? '・' + sp2.join('、') + ' 分' : '') + (e._pending ? '・<em>待上傳</em>' : '') + '</small></button>';
@@ -832,7 +918,7 @@ function renderLedger(){
     h += '</li>';
   }
   document.getElementById('ledger').innerHTML = list.length ? '<ul class="ledger">' + h + '</ul>' : '';
-  const ls = document.getElementById('ledsum'); if (ls) ls.textContent = list.length ? '共 ' + list.length + ' 筆・NT$ ' + fmt(all) : '';
+  const ls = document.getElementById('ledsum'); if (ls) ls.textContent = spend.length ? '共 ' + spend.length + ' 筆・NT$ ' + fmt(all) : '';
   updateSync();
 }
 function renderSettle(list){
@@ -844,7 +930,7 @@ function renderSettle(list){
   for (const e of list) {
     if (!PEOPLE.includes(e.who)) { skipped++; continue; }
     const c = e.cur === 'TWD' ? 'TWD' : 'JPY', m = splitOf(e);
-    paid[c][e.who] += e.amount; tot[c] += e.amount;
+    paid[c][e.who] += e.amount; if (e.cat !== '結清') tot[c] += e.amount;
     if (hasShares(e)) { for (const p of PEOPLE) owe[c][p] += Number(e.shares[p]) || 0; } else for (const p of m) owe[c][p] += e.amount / m.length;
   }
   const diff = {}; for (const p of PEOPLE) { const j = paid.JPY[p] - owe.JPY[p], t = paid.TWD[p] - owe.TWD[p]; diff[p] = { j, t, all: j * L.rate + t }; }
@@ -863,7 +949,7 @@ function renderSettle(list){
   }
   if (!(tot.JPY || tot.TWD)) h += '<div class="even">還沒有分帳資料，記帳時選「誰先付的」就會自動算</div>';
   else if (!tr.length) h += '<div class="even">目前大家打平，不用轉帳</div>';
-  else h += '<div class="xfer">' + tr.map(([a,b,x]) => '<div><span class="p">' + a + '</span><span class="arrow">付給 →</span><span class="p">' + b + '</span><span class="amt">NT$ ' + fmt(x) + '<small>或 ' + fmt(x / L.rate) + ' 円</small></span></div>').join('') + '</div>';
+  else h += '<div class="xfer">' + tr.map(([a,b,x]) => '<div><span class="p">' + a + '</span><span class="arrow">付給 →</span><span class="p">' + b + '</span><span class="amt">NT$ ' + fmt(x) + '<small>或 ' + fmt(x / L.rate) + ' 円</small></span><button type="button" class="settlebtn" data-settle="' + a + '|' + b + '|' + Math.round(x / L.rate) + '">已結清</button></div>').join('') + '</div><p class="stlnote">轉完帳後按「已結清」，這筆會記到明細裡，結算就會歸零；在明細刪掉那筆就能取消。</p>';
   if (skipped) h += '<p class="skip">有 ' + skipped + ' 筆沒有選付款人，未列入分帳。</p>';
   box.innerHTML = h;
 }
@@ -929,6 +1015,13 @@ document.getElementById('view').addEventListener('click', ev => {
   if (ev.target.closest('#cancelEdit')) { endEdit(); return; }
   if (ev.target.closest('#rateBtn')) { fetchRate(true); return; }
   const eb = ev.target.closest('[data-edit]'); if (eb) { startEdit(eb.dataset.edit); return; }
+  const sb2 = ev.target.closest('[data-settle]'); if (sb2) {
+    if (!sb2.classList.contains('armed')) { document.querySelectorAll('.settlebtn.armed').forEach(b => { b.classList.remove('armed'); b.textContent = '已結清'; }); sb2.classList.add('armed'); sb2.textContent = '確定？'; clearTimeout(sb2._t); sb2._t = setTimeout(() => { sb2.classList.remove('armed'); sb2.textContent = '已結清'; }, 4000); return; }
+    clearTimeout(sb2._t); sb2.disabled = true; sb2.textContent = '記錄中';
+    const [from, to, amt] = sb2.dataset.settle.split('|');
+    Promise.resolve(addEntry({ amount: Number(amt), cur: 'JPY', cat: '結清', item: from + ' → ' + to, day: Number(defaultDay()), who: from, split: [to], shares: { [to]: Number(amt) }, ts: Date.now() })).catch(() => { sb2.disabled = false; sb2.textContent = '已結清'; });
+    return;
+  }
   const db = ev.target.closest('.del'); if (db) {
     if (!db.classList.contains('armed')) {
       document.querySelectorAll('.del.armed').forEach(b => { b.classList.remove('armed'); b.textContent = '×'; });
@@ -1026,6 +1119,7 @@ function show(){
   renderNav(id); window.scrollTo(0, 0);
   ANIM++;
   if (id === 'cost') { startLedger(); renderLedger(); if (!L.shared && L.rateSrc !== '手動' && (Date.now() - L.rateTs > 6 * 3600000 || L.rateSrc === '預設')) fetchRate(false); }
+  if (/^day/.test(id)) fillWeather(Number(id.slice(3)));
   if (id === 'overview') { requestAnimationFrame(() => playToday()); const pb = el('playbtn'); if (pb) pb.addEventListener('click', playAll); }
 }
 document.getElementById('view').addEventListener('click', e => {
