@@ -18,6 +18,7 @@
 ## 規則
 - 介面文字一律繁體中文。
 - 保持單檔、不加建置工具；外部只用 Google Fonts、Firebase SDK（gstatic）、匯率 API。
+- 「手繪」「動態」兩種插畫風格刻意保留，圖片直接從第三方伺服器載入：`blogger.googleusercontent.com`（いらすとや）與 `fonts.gstatic.com/s/e/notoemoji`（Noto Emoji）。這是允許的外部連線；這兩個來源的圖片是不透明回應，`sw.js` 刻意不快取，新增其他外部圖片來源時也照此處理。授權說明放在 `CREDITS.md`。
 - Firestore 安全規則（完整內容在 README）只開放 `expenses` 和 `meta/rate`，並限制欄位與型別；記帳資料新增或改名欄位時，要同步改規則的 `hasOnly([...])`。新旅程若要新帳本，也要同步更新 Firebase 主控台的規則。
 - 文字顏色用 `--rose-t`／`--sage-t`／`--mustard-t`（已加深，對比度 ≥ 4.5:1），不要直接用 `--rose` 等原色當小字顏色。
 - 改完先在本機用瀏覽器開 `index.html` 測試（記帳在本機會因 Firebase 網域限制而改存手機），再 commit / push。
