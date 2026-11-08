@@ -885,6 +885,8 @@ function chartHTML(list, byCat){
 function renderLedger(){
   const sp = document.getElementById('spent'); if (!sp) return;
   const list = L.list;
+  /* 正在修改的那筆被別人刪掉了：離開修改模式，避免存檔時把它重新建回來 */
+  if (L.editing && !list.some(e => e.id === L.editing)) { endEdit(); const m = document.getElementById('msg'); if (m) { m.style.color = ''; m.textContent = '這筆已被刪除，已取消修改'; } }
   let jpy = 0, twd = 0, all = 0, pend = 0;
   const spend = list.filter(e => e.cat !== '結清');
   for (const e of spend) { if (e.cur === 'TWD') twd += e.amount; else jpy += e.amount; }
