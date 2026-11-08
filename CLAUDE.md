@@ -4,7 +4,7 @@
 
 ## 檔案
 - `index.html`：整個網站（HTML + CSS + JS 都在這一個檔），沒有建置步驟，改完 push 就會由 GitHub Pages 發布。
-- `sw.js`：Service Worker，離線快取網站與字體、Firebase SDK。改了快取清單時把 `VERSION` 加一。
+- `sw.js`：Service Worker，離線快取網站與字體、Firebase SDK。改了快取清單、或改了圖檔／字型這類「有快取就不再連網」的檔案內容（例如換圖）時，要把 `VERSION` 加一才會更新。跨網站的圖片（手繪、動態風格）是不透明回應，不快取。
 - `manifest.webmanifest`、`icon-*.png`：加到主畫面用的 App 設定與圖示。
 
 ## index.html 裡的重點區塊（用搜尋找）
